@@ -49,7 +49,11 @@ class _IntroState extends State<Intro> {
               },
               child: const Text('카카오로 시작하기'),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromRGBO(255, 193, 100, 1)),
+                  backgroundColor: Color.fromRGBO(255, 193, 100, 1),
+                  textStyle: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontFamily: 'Nanum',
+                      fontSize: 24)),
             ),
           )
         ],
