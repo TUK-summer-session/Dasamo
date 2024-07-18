@@ -1,6 +1,7 @@
 import 'package:dasamo/src/screen/community_page.dart';
 import 'package:dasamo/src/screen/home_page.dart';
 import 'package:dasamo/src/screen/my_page.dart';
+import 'package:dasamo/src/screen/review_detail.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -45,7 +46,7 @@ class _HomeState extends State<Home> {
   ];
 
   final List<Widget> myTabItems = [
-    HomePage(),
+    ReviewDetail(),
     CommunityPage(),
     MyPage(),
   ];

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class ImageListWidget extends StatelessWidget {
+class StarListWidget extends StatelessWidget {
   final int number;
 
-  const ImageListWidget({Key? key, this.number = 1})
+  const StarListWidget({Key? key, this.number = 1})
       : super(key: key); // number=1은 기본값
 
   @override
