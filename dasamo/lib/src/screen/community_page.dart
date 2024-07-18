@@ -1,6 +1,9 @@
 // 홈 페이지 위젯
+import 'package:dasamo/src/widgets/Input/comment_input.dart';
+import 'package:dasamo/src/widgets/Input/comments.dart';
 import 'package:dasamo/src/widgets/list/image_list_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 // 리뷰 세부페이지
 class CommunityPage extends StatefulWidget {
@@ -81,6 +84,7 @@ class _CommunityPageState extends State<CommunityPage> {
               ],
             ),
           ),
+
           // 리뷰 이미지
           Container(
             height: 300,
@@ -141,7 +145,59 @@ class _CommunityPageState extends State<CommunityPage> {
                       });
                     },
                     onTap: () {
-                      // 아이콘을 탭했을 때 실행할 동작
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true, // 모달 높이 조절
+                        builder: (context) {
+                          double screenHeight =
+                              MediaQuery.of(context).size.height;
+                          return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              height: screenHeight * 0.7,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 40,
+                                            alignment: Alignment.center,
+                                            child: Container(
+                                              // 내부 컨테이너 예시
+                                              height: 5,
+                                              width: 50,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black,
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                              ),
+                                            ),
+                                          ), // 간격을 주기 위한 Container
+                                          Comments(),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: CommentInput(
+                                      onSave: (comment) {
+                                        // 저장 로직을 이곳에 구현
+                                        print('저장된 댓글: $comment');
+                                        // 저장 처리 로직 추가 가능
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ));
+                        },
+                      );
                       print('Comment 아이콘을 탭했습니다.');
                     },
                     child: Icon(
@@ -193,7 +249,7 @@ class _CommunityPageState extends State<CommunityPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Colors.black, // 테두리 색상
+                            color: Color.fromARGB(255, 113, 113, 113), // 테두리 색상
                             width: 1.0, // 테두리 두께
                           ),
                         ),
@@ -214,7 +270,7 @@ class _CommunityPageState extends State<CommunityPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Colors.black, // 테두리 색상
+                            color: Color.fromARGB(255, 113, 113, 113), // 테두리 색상
                             width: 1.0, // 테두리 두께
                           ),
                         ),
@@ -241,11 +297,11 @@ class _CommunityPageState extends State<CommunityPage> {
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
-                  color: Colors.black, // 위쪽 테두리 색상
+                  color: Color.fromARGB(255, 163, 163, 163), // 위쪽 테두리 색상
                   width: 1.0, // 위쪽 테두리 두께
                 ),
                 bottom: BorderSide(
-                  color: Colors.black, // 아래쪽 테두리 색상
+                  color: Color.fromARGB(255, 163, 163, 163), // 아래쪽 테두리 색상
                   width: 1.0, // 아래쪽 테두리 두께
                 ),
               ),
