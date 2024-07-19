@@ -1,20 +1,19 @@
 // 홈 페이지 위젯
 import 'package:dasamo/src/widgets/Input/comment_input.dart';
 import 'package:dasamo/src/widgets/Input/comments.dart';
-import 'package:dasamo/src/widgets/expand/expand_text.dart';
 import 'package:dasamo/src/widgets/list/star_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 // 리뷰 세부페이지
-class CommunityPage extends StatefulWidget {
-  const CommunityPage({super.key});
+class ReviewDetail extends StatefulWidget {
+  const ReviewDetail({super.key});
 
   @override
-  State<CommunityPage> createState() => _CommunityPageState();
+  State<ReviewDetail> createState() => _ReviewDetailState();
 }
 
-class _CommunityPageState extends State<CommunityPage> {
+class _ReviewDetailState extends State<ReviewDetail> {
   // 아이콘 hover
   bool _favoriteHovered = false;
   bool _favoriteTapped = false;
@@ -28,9 +27,6 @@ class _CommunityPageState extends State<CommunityPage> {
   // 구매하기 버튼 hover
   bool _buttonHovered = false;
 
-  // 텍스트 확장
-  bool _isExpanded = false;
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -40,7 +36,7 @@ class _CommunityPageState extends State<CommunityPage> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.fromLTRB(20, 20, 20, 0), // 원하는 패딩 값 설정
-            child: Text('커뮤니티'),
+            child: Icon(Icons.chevron_left, size: 32.0),
           ),
           // 프로필
           Container(
@@ -73,14 +69,18 @@ class _CommunityPageState extends State<CommunityPage> {
                         Text(
                           '게시일',
                           style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey,
+                            fontSize: 10, // 글자 크기
+                            color: Colors.grey, // 글자 색상
                           ),
                         ),
                       ],
                     ),
                   ),
                 ]),
+                Container(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10), // 왼쪽 여백 추가
+                  child: StarListWidget(number: 3),
+                ),
               ],
             ),
           ),
@@ -209,20 +209,192 @@ class _CommunityPageState extends State<CommunityPage> {
                           : null,
                     ),
                   ),
+                  SizedBox(width: 5),
+                  InkWell(
+                    onHover: (hovered) {
+                      setState(() {
+                        _bookmarkHovered = hovered; // 마우스 호버 상태 업데이트
+                      });
+                    },
+                    onTap: () {
+                      setState(() {
+                        _bookmarkTapped = !_bookmarkTapped; // 아이콘의 탭 상태 토글
+                      });
+                      print('Bookmark 아이콘을 탭했습니다.');
+                    },
+                    child: _bookmarkTapped
+                        ? Icon(
+                            Icons.bookmark,
+                            color:
+                                Color.fromRGBO(255, 193, 100, 1.0), // 클릭된 경우 색상
+                          )
+                        : Icon(
+                            _bookmarkHovered
+                                ? Icons.bookmark
+                                : Icons.bookmark_border,
+                            color: _bookmarkHovered
+                                ? Color.fromRGBO(255, 193, 100, 1.0)
+                                : null,
+                          ),
+                  ),
                 ]),
+                Container(
+                  padding: EdgeInsets.only(left: 10), // 왼쪽 여백 추가
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.fromLTRB(10.0, 0, 0, 0),
+                        height: 20,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Color.fromARGB(255, 113, 113, 113), // 테두리 색상
+                            width: 1.0, // 테두리 두께
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '비건',
+                            style: TextStyle(
+                              // 텍스트 색상
+                              fontSize: 12, // 텍스트 크기
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(10.0, 0, 0, 0),
+                        height: 20,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Color.fromARGB(255, 113, 113, 113), // 테두리 색상
+                            width: 1.0, // 테두리 두께
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '비건',
+                            style: TextStyle(
+                              // 텍스트 색상
+                              fontSize: 12, // 텍스트 크기
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 구매하기
+          Container(
+            padding: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: Color.fromARGB(255, 163, 163, 163), // 위쪽 테두리 색상
+                  width: 1.0, // 위쪽 테두리 두께
+                ),
+                bottom: BorderSide(
+                  color: Color.fromARGB(255, 163, 163, 163), // 아래쪽 테두리 색상
+                  width: 1.0, // 아래쪽 테두리 두께
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween, // 첫 번째와 마지막을 양쪽 끝에 정렬
+              children: <Widget>[
+                Row(children: <Widget>[
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image:
+                            AssetImage('assets/images/product.jpg'), // 로컬 이미지
+                        fit: BoxFit.cover, // 이미지를 컨테이너 크기에 맞춤
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 20), // 왼쪽 여백 추가
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('상품명'),
+                        SizedBox(height: 5),
+                        Text(
+                          '가격',
+                        ),
+                      ],
+                    ),
+                  ),
+                ]),
+                Container(
+                  padding: EdgeInsets.only(left: 10), // 왼쪽 여백 추가
+                  child: Row(
+                    children: [
+                      // 버튼
+                      InkWell(
+                        onHover: (hovered) {
+                          setState(() {
+                            _buttonHovered = hovered; // 마우스 호버 상태 업데이트
+                          });
+                        },
+                        onTap: () {
+                          // 버튼을 탭했을 때 실행할 동작
+                          print('구매하기 버튼을 탭했습니다.');
+                        },
+                        child: AnimatedContainer(
+                          duration:
+                              Duration(milliseconds: 100), // 애니메이션 지속 시간 설정
+                          decoration: BoxDecoration(
+                            color: _buttonHovered
+                                ? Color.fromRGBO(175, 99, 120, 1.0)
+                                : Color.fromRGBO(175, 99, 120, 0.43),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          child: Text(
+                            '구매하기',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
 
           Container(
-            padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+            padding: EdgeInsets.all(20.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              ExpandText(
-                text:
-                    '샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라',
+              Text(
+                '이거 진짜 맛있어요',
+                style: TextStyle(
+                  fontSize: 18, // 글자 크기
+                  // 글자 색상
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                '샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라',
                 style: TextStyle(
                   fontSize: 15, // 글자 크기
+                  // 글자 색상
                 ),
               ),
               SizedBox(height: 10),
