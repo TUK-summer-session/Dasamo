@@ -69,7 +69,12 @@ class _ReviewDetailState extends State<ReviewDetail> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('작성자'),
+                          Text(
+                            '작성자',
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
                           SizedBox(height: 5),
                           Text(
                             '게시일',

@@ -72,7 +72,12 @@ class _CommunityPageState extends State<CommunityPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(comment['author']),
+                                  Text(
+                                    comment['author'],
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),
+                                  ),
                                   SizedBox(height: 5),
                                   Text(
                                     comment['date'],
