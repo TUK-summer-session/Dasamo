@@ -1,8 +1,9 @@
 import 'package:dasamo/src/home.dart';
 import 'package:dasamo/src/screens/community_page.dart';
-import 'package:dasamo/src/screens/home_page.dart';
 import 'package:dasamo/src/screens/intro.dart';
 import 'package:dasamo/src/screens/my_page.dart';
+import 'package:dasamo/src/screens/review/show.dart';
+import 'package:dasamo/src/shared/review_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,14 +27,25 @@ class MyApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
-          ))),
+          )),
+          floatingActionButtonTheme: FloatingActionButtonThemeData(
+            backgroundColor: Color.fromRGBO(175, 99, 120, 1),
+          )),
       routes: {
         '/': (context) => Intro(),
-        '/home': (context) => HomePage(),
         '/community': (context) => CommunityPage(),
         '/mypage': (context) => MyPage(),
       },
       initialRoute: '/',
+      onGenerateRoute: (route) {
+        if (route.name!.startsWith('/review/')) {
+          final id = int.parse(route.name!.split('/').last);
+          final item = reviewData.firstWhere((e) => e['id'] == id);
+          return MaterialPageRoute(
+            builder: (context) => ReviewShow(item: item),
+          );
+        }
+      },
     );
   }
 }

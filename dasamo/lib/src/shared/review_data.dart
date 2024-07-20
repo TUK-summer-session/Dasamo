@@ -6,7 +6,9 @@ List<Map<String, dynamic>> reviewData = [
     'imageFile': '/',
     'tagKind': ['저칼로리', '0칼로리', '저당'],
     'like': 100,
-    'comment': 100
+    'comment': 100,
+    'writer': '작성자',
+    'creationDate': '2024-00-00'
   },
   {
     'id': 2,
@@ -15,7 +17,9 @@ List<Map<String, dynamic>> reviewData = [
     'imageFile': '/',
     'tagKind': ['저칼로리', '0칼로리', '저당'],
     'like': 100,
-    'comment': 100
+    'comment': 100,
+    'writer': '작성자',
+    'creationDate': '2024-00-00'
   },
   {
     'id': 3,
@@ -24,7 +28,9 @@ List<Map<String, dynamic>> reviewData = [
     'imageFile': '/',
     'tagKind': ['저칼로리', '0칼로리', '저당'],
     'like': 100,
-    'comment': 100
+    'comment': 100,
+    'writer': '작성자',
+    'creationDate': '2024-00-00'
   },
   {
     'id': 4,
@@ -33,7 +39,9 @@ List<Map<String, dynamic>> reviewData = [
     'imageFile': '/',
     'tagKind': ['저칼로리', '0칼로리', '저당'],
     'like': 100,
-    'comment': 100
+    'comment': 100,
+    'writer': '작성자',
+    'creationDate': '2024-00-00'
   },
   {
     'id': 5,
@@ -51,7 +59,9 @@ List<Map<String, dynamic>> reviewData = [
     'imageFile': '/',
     'tagKind': ['저칼로리', '0칼로리', '저당'],
     'like': 100,
-    'comment': 100
+    'comment': 100,
+    'writer': '작성자',
+    'creationDate': '2024-00-00'
   },
   {
     'id': 7,
@@ -60,6 +70,8 @@ List<Map<String, dynamic>> reviewData = [
     'imageFile': '/',
     'tagKind': ['저칼로리', '0칼로리', '저당'],
     'like': 100,
-    'comment': 100
+    'comment': 100,
+    'writer': '작성자',
+    'creationDate': '2024-00-00'
   },
 ];
