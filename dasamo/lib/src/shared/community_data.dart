@@ -6,7 +6,8 @@ List<Map<String, dynamic>> communityData = [
     'author': 'User1',
     'date': '2024-07-20',
     'image': 'assets/images/salad.jpg',
-    'text': '이 글 정말 좋네요! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라...',
+    'text':
+        '이 글 정말 좋네요! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라',
   },
   {
     'profileImage': 'assets/images/profile.jpg',
