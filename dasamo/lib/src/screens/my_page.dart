@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:dasamo/src/controllers/my_page_tab_controller.dart';
 import 'package:dasamo/src/shared/tab_data.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -12,17 +14,18 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   final MyPageTabController controller = MyPageTabController();
 
+  // 프로필 정보 - 이미지 업로드
+  File? _selectedImage;
+  final ImageProvider _defaultImage = AssetImage('assets/images/profile.jpg');
+
+  // 프로필 정보 - 이름
+  String _userName = '작성자'; // 기본 사용자 이름
+
   @override
   Widget build(BuildContext context) {
-    // 화면의 너비를 가져옵니다.
     double screenWidth = MediaQuery.of(context).size.width;
-
-    // 바의 위치를 텍스트 항목에 맞게 조정합니다.
-    double barWidth =
-        screenWidth / tabDataList.length; // 텍스트 항목의 개수에 따라 바의 너비 설정
+    double barWidth = screenWidth / tabDataList.length;
     double barPosition = barWidth * controller.selectedIndex;
-
-    // 현재 선택된 탭의 데이터
     final currentTabData = tabDataList[controller.selectedIndex];
 
     return Scaffold(
@@ -47,36 +50,38 @@ class _MyPageState extends State<MyPage> {
             Container(
               padding: EdgeInsets.fromLTRB(40, 30, 0, 20),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Row(children: <Widget>[
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/profile.jpg'),
-                          fit: BoxFit.cover,
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: _showProfileModal,
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/profile.jpg'),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '작성자',
-                            style: TextStyle(
-                              fontSize: 25,
-                            ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '작성자',
+                          style: TextStyle(
+                            fontSize: 25,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ]),
+                  ),
                 ],
               ),
             ),
@@ -86,7 +91,6 @@ class _MyPageState extends State<MyPage> {
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Stack(
                 children: [
-                  // 바
                   AnimatedPositioned(
                     duration: Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
@@ -98,8 +102,6 @@ class _MyPageState extends State<MyPage> {
                       color: Color.fromRGBO(175, 99, 120, 1),
                     ),
                   ),
-
-                  // 텍스트
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Row(
@@ -117,19 +119,18 @@ class _MyPageState extends State<MyPage> {
 
             // 추가 이미지나 콘텐츠
             GridView.builder(
-              shrinkWrap: true, // GridView의 크기를 부모에 맞게 조정합니다.
-              physics: NeverScrollableScrollPhysics(), // GridView 자체의 스크롤 비활성화
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // 3개의 열
-                childAspectRatio: 1, // 정사각형 모양
+                crossAxisCount: 3,
+                childAspectRatio: 1,
               ),
-              itemCount: currentTabData.images.length, // 선택된 탭에 맞는 이미지 개수
+              itemCount: currentTabData.images.length,
               itemBuilder: (context, index) {
                 return Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(
-                          currentTabData.images[index]), // 현재 선택된 탭에 따라 이미지 설정
+                      image: AssetImage(currentTabData.images[index]),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -156,7 +157,7 @@ class _MyPageState extends State<MyPage> {
         cursor: SystemMouseCursors.click,
         child: Container(
           width: tabWidth,
-          height: 50, // 탭의 높이 설정
+          height: 50,
           alignment: Alignment.center,
           child: Text(
             title,
@@ -170,5 +171,146 @@ class _MyPageState extends State<MyPage> {
         ),
       ),
     );
+  }
+
+  void _showProfileModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '프로필 정보',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 16),
+                  // 이미지 표시 부분
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: _selectedImage == null
+                            ? _defaultImage
+                            : FileImage(_selectedImage!) as ImageProvider,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.photo_library),
+                            onPressed: () async {
+                              await _pickImage();
+                              setState(() {});
+                            },
+                          ),
+                          SizedBox(height: 4),
+                          Text('이미지 선택'),
+                        ],
+                      ),
+                      SizedBox(width: 32),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.camera_alt),
+                            onPressed: () async {
+                              await _takePhoto();
+                              setState(() {});
+                            },
+                          ),
+                          SizedBox(height: 4),
+                          Text('사진 찍기'),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  // 이름 입력란
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(70, 0, 70, 0),
+                        child: Text(
+                          '이름:',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: TextEditingController(text: _userName),
+                          onChanged: (value) {
+                            setState(() {
+                              _userName = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            border: InputBorder.none, // 테두리 없음
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      // 저장 버튼 클릭 시의 동작 정의
+                      // 여기에 저장 로직을 추가하세요
+                      Navigator.of(context).pop(); // 모달 창 닫기
+                    },
+                    child: Text('저장'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    ).then((_) {
+      // 모달 창이 닫힌 후 기본 이미지로 리셋
+      setState(() {
+        _selectedImage = null; // 기본 이미지로 리셋
+      });
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _takePhoto() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
   }
 }
