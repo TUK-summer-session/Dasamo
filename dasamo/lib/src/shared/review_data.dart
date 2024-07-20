@@ -8,7 +8,12 @@ List<Map<String, dynamic>> reviewData = [
     'like': 100,
     'comment': 100,
     'writer': '작성자',
-    'creationDate': '2024-00-00'
+    'creationDate': '2024-00-00',
+    'brandSearch': '제조사',
+    'productSearch': '제품명',
+    'image': '/',
+    'price': 10000,
+    'calorie': "100kcal",
   },
   {
     'id': 2,
@@ -19,7 +24,12 @@ List<Map<String, dynamic>> reviewData = [
     'like': 100,
     'comment': 100,
     'writer': '작성자',
-    'creationDate': '2024-00-00'
+    'creationDate': '2024-00-00',
+    'brandSearch': '제조사',
+    'productSearch': '제품명',
+    'image': '/',
+    'price': 10000,
+    'calorie': "100kcal",
   },
   {
     'id': 3,
@@ -30,7 +40,13 @@ List<Map<String, dynamic>> reviewData = [
     'like': 100,
     'comment': 100,
     'writer': '작성자',
-    'creationDate': '2024-00-00'
+    'creationDate': '2024-00-00',
+    'brandSearch': '제조사',
+    'productSearch': '제품명',
+    'image': '/',
+    'price': 10000,
+    'calorie': "100kcal",
+    
   },
   {
     'id': 4,
@@ -41,7 +57,13 @@ List<Map<String, dynamic>> reviewData = [
     'like': 100,
     'comment': 100,
     'writer': '작성자',
-    'creationDate': '2024-00-00'
+    'creationDate': '2024-00-00',
+    'brandSearch': '제조사',
+    'productSearch': '제품명',
+    'image': '/',
+    'price': 10000,
+    'calorie': "100kcal",
+    
   },
   {
     'id': 5,
@@ -50,7 +72,13 @@ List<Map<String, dynamic>> reviewData = [
     'imageFile': '/',
     'tagKind': ['저칼로리', '0칼로리', '저당'],
     'like': 100,
-    'comment': 100
+    'comment': 100,
+    'creationDate': '2024-00-00',
+    'brandSearch': '제조사',
+    'productSearch': '제품명',
+    'image': '/',
+    'price': 10000,
+    'calorie': "100kcal",
   },
   {
     'id': 6,
@@ -61,7 +89,13 @@ List<Map<String, dynamic>> reviewData = [
     'like': 100,
     'comment': 100,
     'writer': '작성자',
-    'creationDate': '2024-00-00'
+    'creationDate': '2024-00-00',
+    'brandSearch': '제조사',
+    'productSearch': '제품명',
+    'image': '/',
+    'price': 10000,
+    'calorie': "100kcal",
+    
   },
   {
     'id': 7,
@@ -72,6 +106,12 @@ List<Map<String, dynamic>> reviewData = [
     'like': 100,
     'comment': 100,
     'writer': '작성자',
-    'creationDate': '2024-00-00'
+    'creationDate': '2024-00-00',
+    'brandSearch': '제조사',
+    'productSearch': '제품명',
+    'image': '/',
+    'price': 10000,
+    'calorie': "100kcal",
+    
   },
 ];

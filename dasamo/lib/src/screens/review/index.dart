@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:dasamo/src/controllers/review_controller.dart';
+import 'package:dasamo/src/screens/review/add_manufacturer_info.dart';
 import 'package:dasamo/src/shared/tag_data.dart';
 import 'package:dasamo/src/widgets/buttons/tag_button.dart';
 import 'package:dasamo/src/widgets/listItems/review_list_item.dart';
@@ -47,7 +48,13 @@ class _ReviewIndexState extends State<ReviewIndex> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: addItem,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const AddManufacturerInfo()),
+          );
+        },
         child: Icon(
           Icons.add,
           color: Colors.white,
@@ -70,27 +77,31 @@ class _ReviewIndexState extends State<ReviewIndex> {
             child: SizedBox(
               height: 30,
               child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: tagList.map((tag) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 5.0),
-                      child: TagButton(
-                        title: tag['name'],
-                        isSelected: _selectedTag == tag['name'],
-                        onTap: () => _onTagSelected(tag['name']),
-                      ),
-                    );
-                  }).toList()),
+                scrollDirection: Axis.horizontal,
+                children: tagList.map((tag) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 5.0),
+                    child: TagButton(
+                      title: tag['name'],
+                      isSelected: _selectedTag == tag['name'],
+                      onTap: () => _onTagSelected(tag['name']),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ),
           Expanded(
-              child: Obx(() => ListView.builder(
-                    itemCount: reviewController.reviewList.length,
-                    itemBuilder: (context, index) {
-                      final item = reviewController.reviewList[index];
-                      return ReviewListItem(item);
-                    },
-                  )))
+            child: Obx(
+              () => ListView.builder(
+                itemCount: reviewController.reviewList.length,
+                itemBuilder: (context, index) {
+                  final item = reviewController.reviewList[index];
+                  return ReviewListItem(item);
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -1,4 +1,3 @@
-import 'package:dasamo/src/screens/review/edit.dart';
 import 'package:dasamo/src/screens/review/show.dart';
 import 'package:flutter/material.dart';
 import 'package:dasamo/src/widgets/buttons/review_tag_button.dart';
@@ -16,7 +15,7 @@ class ReviewListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Get.to(() => ReviewShow(item: item));
+        Get.to(() => ReviewShow(reviewItem: item));
       },
       child: Stack(
         children: [
