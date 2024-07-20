@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'package:dasamo/src/widgets/modal/mypage_modal.dart';
+import 'package:flutter/material.dart';
 import 'package:dasamo/src/controllers/my_page_tab_controller.dart';
 import 'package:dasamo/src/shared/tab_data.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -74,7 +74,7 @@ class _MyPageState extends State<MyPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '작성자',
+                          _userName,
                           style: TextStyle(
                             fontSize: 25,
                           ),
@@ -178,139 +178,21 @@ class _MyPageState extends State<MyPage> {
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '프로필 정보',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 16),
-                  // 이미지 표시 부분
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: _selectedImage == null
-                            ? _defaultImage
-                            : FileImage(_selectedImage!) as ImageProvider,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.photo_library),
-                            onPressed: () async {
-                              await _pickImage();
-                              setState(() {});
-                            },
-                          ),
-                          SizedBox(height: 4),
-                          Text('이미지 선택'),
-                        ],
-                      ),
-                      SizedBox(width: 32),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.camera_alt),
-                            onPressed: () async {
-                              await _takePhoto();
-                              setState(() {});
-                            },
-                          ),
-                          SizedBox(height: 4),
-                          Text('사진 찍기'),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  // 이름 입력란
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(70, 0, 70, 0),
-                        child: Text(
-                          '이름:',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Expanded(
-                        child: TextField(
-                          controller: TextEditingController(text: _userName),
-                          onChanged: (value) {
-                            setState(() {
-                              _userName = value;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            border: InputBorder.none, // 테두리 없음
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // 저장 버튼 클릭 시의 동작 정의
-                      // 여기에 저장 로직을 추가하세요
-                      Navigator.of(context).pop(); // 모달 창 닫기
-                    },
-                    child: Text('저장'),
-                  ),
-                ],
-              ),
-            );
+        return MyPageModal(
+          selectedImage: _selectedImage,
+          onImageChanged: (image) {
+            setState(() {
+              _selectedImage = image;
+            });
+          },
+          userName: _userName,
+          onUserNameChanged: (name) {
+            setState(() {
+              _userName = name;
+            });
           },
         );
       },
-    ).then((_) {
-      // 모달 창이 닫힌 후 기본 이미지로 리셋
-      setState(() {
-        _selectedImage = null; // 기본 이미지로 리셋
-      });
-    });
-  }
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _takePhoto() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
+    );
   }
 }
