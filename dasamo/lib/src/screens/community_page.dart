@@ -1,8 +1,10 @@
+import 'package:dasamo/src/controllers/comments_contoller.dart';
+import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
-import 'package:dasamo/src/widgets/Input/comment_input.dart';
-import 'package:dasamo/src/widgets/Input/comments.dart';
+import 'package:dasamo/src/widgets/comment/comment_input.dart';
+import 'package:dasamo/src/widgets/comment/comments.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
 
 class CommunityPage extends StatefulWidget {
@@ -19,6 +21,8 @@ class _CommunityPageState extends State<CommunityPage> {
 
   bool _commentHovered = false;
   bool _commentTapped = false;
+
+  final CommentsController commentsController = Get.put(CommentsController());
 
   final CommunityController communityController =
       Get.put(CommunityController());
@@ -141,7 +145,7 @@ class _CommunityPageState extends State<CommunityPage> {
                                 setState(() {
                                   _favoriteTapped = !_favoriteTapped;
                                 });
-                                print('Bookmark 아이콘을 탭했습니다.');
+                                print('heart 아이콘을 탭했습니다.');
                               },
                               child: _favoriteTapped
                                   ? Icon(
@@ -167,65 +171,8 @@ class _CommunityPageState extends State<CommunityPage> {
                                 showModalBottomSheet(
                                   context: context,
                                   isScrollControlled: true,
-                                  builder: (context) {
-                                    double screenHeight =
-                                        MediaQuery.of(context).size.height;
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      height: screenHeight * 0.7,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    height: 40,
-                                                    alignment: Alignment.center,
-                                                    child: Container(
-                                                      height: 5,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.black,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(30),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Comments(), // Comments widget
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: CommentInput(
-                                              onSave: (comment) {
-                                                communityController.addComment({
-                                                  'profileImage':
-                                                      'assets/images/profile_new.jpg',
-                                                  'author': 'New User',
-                                                  'date': '2024-07-21',
-                                                  'image':
-                                                      'assets/images/salad.jpg',
-                                                  'text': comment,
-                                                });
-                                                print('저장된 댓글: $comment');
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
+                                  builder: (context) =>
+                                      CommentModal(), // CommentModal 사용
                                 );
                                 print('Comment 아이콘을 탭했습니다.');
                               },

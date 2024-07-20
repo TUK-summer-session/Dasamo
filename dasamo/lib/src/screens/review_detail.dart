@@ -1,7 +1,8 @@
 // 홈 페이지 위젯
-import 'package:dasamo/src/widgets/Input/comment_input.dart';
-import 'package:dasamo/src/widgets/Input/comments.dart';
+import 'package:dasamo/src/widgets/comment/comment_input.dart';
+import 'package:dasamo/src/widgets/comment/comments.dart';
 import 'package:dasamo/src/widgets/list/star_list_widget.dart';
+import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -157,56 +158,9 @@ class _ReviewDetailState extends State<ReviewDetail> {
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
-                          isScrollControlled: true, // 모달 높이 조절
-                          builder: (context) {
-                            double screenHeight =
-                                MediaQuery.of(context).size.height;
-                            return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                height: screenHeight * 0.7,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 40,
-                                              alignment: Alignment.center,
-                                              child: Container(
-                                                // 내부 컨테이너 예시
-                                                height: 5,
-                                                width: 50,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.black,
-                                                  borderRadius:
-                                                      BorderRadius.circular(30),
-                                                ),
-                                              ),
-                                            ), // 간격을 주기 위한 Container
-                                            Comments(),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: CommentInput(
-                                        onSave: (comment) {
-                                          // 저장 로직을 이곳에 구현
-                                          print('저장된 댓글: $comment');
-                                          // 저장 처리 로직 추가 가능
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ));
-                          },
+                          isScrollControlled: true,
+                          builder: (context) =>
+                              CommentModal(), // CommentModal 사용
                         );
                         print('Comment 아이콘을 탭했습니다.');
                       },
