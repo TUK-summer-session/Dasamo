@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	  <!-- 카메라 권한 -->
+	  <key>NSCameraUsageDescription</key>
+	  <string>이 앱은 카메라 접근이 필요합니다.</string>
+  
+	  <!-- 사진 라이브러리 권한 -->
+	  <key>NSPhotoLibraryUsageDescription</key>
+	  <string>이 앱은 사진 라이브러리 접근이 필요합니다.</string>
+  
 </dict>
 </plist>

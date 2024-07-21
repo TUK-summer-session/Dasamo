@@ -34,10 +34,15 @@ class Comments extends StatelessWidget {
                 ),
                 SizedBox(width: 20),
                 Expanded(
-                  child: Text(
-                    comment['content'],
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                        0, 0, 15, 20), // 원하는 패딩 값을 설정합니다.
+                    child: Text(
+                      comment['content'] ??
+                          'No content', // content가 null일 경우를 대비해 기본값 설정
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
                   ),
                 ),
               ],
