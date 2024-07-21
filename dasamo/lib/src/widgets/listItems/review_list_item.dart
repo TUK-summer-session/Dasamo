@@ -1,5 +1,7 @@
+import 'package:dasamo/src/screens/review/show.dart';
 import 'package:flutter/material.dart';
-import 'package:dasamo/src/widgets/buttons/review_tag_button.dart';
+import 'package:dasamo/src/widgets/buttons/tags/review_tag_button.dart';
+import 'package:get/get.dart';
 
 const double _imageSize = 90;
 
@@ -12,7 +14,9 @@ class ReviewListItem extends StatelessWidget {
     List<String> tagList = List<String>.from(item['tagKind']); // 태그 리스트 생성
 
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Get.to(() => ReviewShow(reviewItem: item));
+      },
       child: Stack(
         children: [
           Padding(

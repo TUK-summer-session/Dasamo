@@ -14,8 +14,8 @@ class StarListWidget extends StatelessWidget {
     for (int i = 0; i < number; i++) {
       images.add(
         Container(
-          width: 40,
-          height: 20,
+          width: 23,
+          height: 11,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/sweet_potato1.jpg'),
@@ -29,8 +29,8 @@ class StarListWidget extends StatelessWidget {
     for (int i = 0; i < 5 - number; i++) {
       images.add(
         Container(
-          width: 40,
-          height: 20,
+          width: 23,
+          height: 11,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/sweet_potato2.jpg'),
