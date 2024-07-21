@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dasamo_server/index.js",
   "scripts": {
-    "start": "dasamo_server/index.js",
+    "start": "nodemon --watch src/ --watch index.js index.js --inspect=0.0.0.0",
     "dev": "nodemon --watch src/ --watch index.js index.js --inspect=0.0.0.0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +14,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "multer": "^1.4.5-lts.1",
-    "mysql2": "^3.10.3"
+    "mysql2": "^3.10.3",
+    "nodemon": "^3.1.4"
   }
 }
