@@ -5,6 +5,29 @@ const getCommunityById = async (communityId) => {
   return result.rows[0];
 };
 
+// 커뮤니티와 회원을 조인하여 가져오는 쿼리 함수
+const getCommunitiesWithMembers = async () => {
+    try {
+      const result = await db.query(`
+        SELECT
+          c.communityId,
+          c.detail,
+          c.createdAt,
+          c.updatedAt,
+          m.memberId,
+          m.email,
+          m.name,
+          m.profileImageUrl
+        FROM Community c
+        JOIN Member m ON c.memberId = m.memberId
+        ORDER BY c.createdAt DESC
+      `);
+      return result;
+    } catch (error) {
+      throw new Error('쿼리 실행 중 오류 발생');
+    }
+  };
+
 const deleteCommunityById = async (communityId) => {
   await db.query("DELETE FROM Community WHERE community_id = $1", [communityId]);
 };
@@ -60,4 +83,5 @@ module.exports = {
   checkIfAlreadyLiked,
   likeCommunityPost,
   unlikeCommunityPost,
+  getCommunitiesWithMembers,
 };

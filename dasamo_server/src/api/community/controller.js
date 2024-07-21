@@ -11,29 +11,26 @@ const {
   checkIfAlreadyLiked,
   likeCommunityPost,
   unlikeCommunityPost,
+  getCommunitiesWithMembers,
 } = require("./repository");
 
+// 커뮤니티 목록 조회
 exports.index = async (req, res) => {
   console.log("Community home");
   try {
-    const result = await db.query(`
-      SELECT c.community_id, c.member_id, c.detail, c.created_at, c.updated_at, 
-             m.profile_image_url, 
-             ARRAY_REMOVE(ARRAY_AGG(ci.url ORDER BY ci."order"), NULL) AS image_urls
-      FROM Community c
-      JOIN Member m ON c.member_id = m.member_id
-      LEFT JOIN CommunityImage ci ON c.community_id = ci.community_id
-      GROUP BY c.community_id, m.profile_image_url
-    `);
+    const result = await getCommunitiesWithMembers();
 
-    const communities = result.rows.map((row) => ({
-      communityId: row.community_id,
-      memberId: row.member_id,
-      profileImageUrl: row.profile_image_url,
-      imageUrls: row.image_urls,
+    const communities = result.map((row) => ({
+      communityId: row.communityId,
       detail: row.detail,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      member: {
+        memberId: row.memberId,
+        email: row.email,
+        name: row.name,
+        profileImageUrl: row.profileImageUrl,
+      },
     }));
 
     const response = createResponse(200, "요청이 성공적으로 처리되었습니다.", {
@@ -46,81 +43,85 @@ exports.index = async (req, res) => {
   }
 };
 
-// Multer 설정 - 파일 업로드를 쉽게 처리할 수 있도록 도와주는 미들웨어
+// Multer 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // 업로드된 파일이 저장될 디렉토리
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix + "-" + file.originalname);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    );
   },
 });
 
 const upload = multer({ storage: storage });
 
-exports.uploadImage = [
-  upload.array("files", 10), // 'files' 필드에 대해 최대 10개의 파일 업로드 처리
-  async (req, res) => {
-    const { communityId } = req.body;
-    const files = req.files;
+// // 단일 이미지 업로드
+// exports.uploadImage = [
+//   upload.single("file"),
+//   async (req, res) => {
+//     const { communityId } = req.body;
+//     const file = req.file;
 
-    if (!communityId || files.length === 0) {
-      return res
-        .status(400)
-        .send(createResponse(400, "요청이 잘못되었습니다."));
-    }
+//     if (!communityId || !file) {
+//       return res
+//         .status(400)
+//         .send(createResponse(400, "요청이 잘못되었습니다."));
+//     }
 
-    try {
-      // 이미지 URL을 CommunityImage 테이블에 삽입
-      const imageInsertPromises = files.map((file, index) => {
-        return db.query(
-          'INSERT INTO CommunityImage (community_id, url, "order") VALUES ($1, $2, $3)',
-          [communityId, file.path, index]
-        );
-      });
+//     try {
+//       await db.query(
+//         "INSERT INTO CommunityImage (communityId, url, `order`) VALUES (?, ?, ?)",
+//         [communityId, file.path, 0]
+//       );
 
-      await Promise.all(imageInsertPromises);
+//       const response = createResponse(200, "이미지 업로드 성공");
+//       res.status(200).send(response);
+//     } catch (error) {
+//       console.error("Query error:", error);
+//       res.status(500).send(createResponse(500, "서버 에러"));
+//     }
+//   },
+// ];
 
-      const response = createResponse(200, "이미지 업로드 성공");
-      res.status(200).send(response);
-    } catch (error) {
-      console.error("Query error:", error);
-      res.status(500).send(createResponse(500, "서버 에러"));
-    }
-  },
-];
-
+// 커뮤니티 저장
 exports.store = [
-  upload.array("files", 10), // 'files' 필드에 대해 최대 10개의 파일 업로드 처리
+  upload.single("file"), // 단일 파일 업로드
   async (req, res) => {
     const { memberId, detail } = req.body;
-    const files = req.files;
+    const file = req.file; // 단일 파일을 처리하기 위한 변수
 
-    if (!memberId || !detail || files.length === 0) {
+    if (!memberId || !detail || !file) {
       return res
         .status(400)
         .send(createResponse(400, "요청이 잘못되었습니다."));
     }
 
     try {
-      // DB에 데이터 삽입
+      // 커뮤니티 데이터 삽입
       const result = await db.query(
-        "INSERT INTO Community (member_id, detail, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING community_id",
+        "INSERT INTO Community (memberId, detail, createdAt, updatedAt) VALUES (?, ?, NOW(), NOW())",
         [memberId, detail]
       );
 
-      const communityId = result.rows[0].community_id;
+      // 새로 생성된 커뮤니티의 ID를 가져옵니다
+      const communityId = (
+        await db.query("SELECT LAST_INSERT_ID() AS communityId")
+      )[0].communityId;
+
+      // 커뮤니티가 정상적으로 생성되었는지 확인
+      if (!communityId) {
+        return res.status(500).send(createResponse(500, "커뮤니티 생성 실패"));
+      }
 
       // 이미지 URL을 CommunityImage 테이블에 삽입
-      const imageInsertPromises = files.map((file, index) => {
-        return db.query(
-          'INSERT INTO CommunityImage (community_id, url, "order") VALUES ($1, $2, $3)',
-          [communityId, file.path, index]
-        );
-      });
-
-      await Promise.all(imageInsertPromises);
+      await db.query(
+        "INSERT INTO CommunityImage (communityId, url) VALUES (?, ?)",
+        [communityId, file.path] // order 열 제거
+      );
 
       const response = createResponse(200, "커뮤니티 저장 성공", {
         communityId,
@@ -133,6 +134,66 @@ exports.store = [
   },
 ];
 
+// 커뮤니티 수정 - PUT 요청
+exports.update = [
+  upload.single("file"), // 단일 파일 업로드
+  async (req, res) => {
+    const { communityId, memberId, detail } = req.body;
+    const file = req.file; // 업로드된 파일 처리 변수
+
+    if (!communityId || !memberId || !detail) {
+      return res
+        .status(400)
+        .send(createResponse(400, "요청이 잘못되었습니다."));
+    }
+
+    try {
+      // 커뮤니티 데이터 업데이트
+      await db.query(
+        "UPDATE Community SET memberId = ?, detail = ?, updatedAt = NOW() WHERE communityId = ?",
+        [memberId, detail, communityId]
+      );
+
+      // 새로운 이미지가 업로드되었는지 확인
+      if (file) {
+        // 기존 이미지 URL을 가져와서 삭제합니다.
+        const [existingImage] = await db.query(
+          "SELECT url FROM CommunityImage WHERE communityId = ? LIMIT 1",
+          [communityId]
+        );
+
+        if (existingImage) {
+          // 파일 시스템에서 기존 이미지 삭제
+          const existingImagePath = existingImage.url;
+          if (fs.existsSync(existingImagePath)) {
+            fs.unlinkSync(existingImagePath);
+          }
+
+          // 기존 이미지를 삭제합니다.
+          await db.query("DELETE FROM CommunityImage WHERE communityId = ?", [
+            communityId,
+          ]);
+        }
+
+        // 새로운 이미지 URL을 CommunityImage 테이블에 삽입
+        await db.query(
+          "INSERT INTO CommunityImage (communityId, url) VALUES (?, ?)",
+          [communityId, file.path]
+        );
+      }
+
+      const response = createResponse(200, "커뮤니티 수정 성공", {
+        communityId,
+      });
+      res.status(200).send(response);
+    } catch (error) {
+      console.error("Query error:", error);
+      res.status(500).send(createResponse(500, "서버 에러"));
+    }
+  },
+];
+
+// 커뮤니티 삭제 -- 수정 필요
 exports.deleteCommunity = async (req, res) => {
   const { communityId } = req.body;
 
@@ -149,22 +210,16 @@ exports.deleteCommunity = async (req, res) => {
         .send(createResponse(400, "존재하지 않는 커뮤니티입니다."));
     }
 
-    // 커뮤니티와 관련된 댓글 삭제
-    await db.query("DELETE FROM Comment WHERE community_id = $1", [
-      communityId,
-    ]);
+    await db.query("DELETE FROM Comment WHERE community_id = ?", [communityId]);
 
-    // 커뮤니티와 관련된 이미지 파일 URL 조회
     const imagePaths = await db.query(
-      "SELECT url FROM CommunityImage WHERE community_id = $1",
+      "SELECT url FROM CommunityImage WHERE community_id = ?",
       [communityId]
     );
 
-    // 데이터베이스에서 커뮤니티 삭제
     await deleteCommunityById(communityId);
 
-    // 서버에서 이미지 파일 삭제
-    imagePaths.rows.forEach((image) => {
+    imagePaths.forEach((image) => {
       if (fs.existsSync(image.url)) {
         fs.unlinkSync(image.url);
       }
@@ -178,6 +233,7 @@ exports.deleteCommunity = async (req, res) => {
   }
 };
 
+// 댓글 조회
 exports.getComments = async (req, res) => {
   const { communityId } = req.body;
 
@@ -199,6 +255,7 @@ exports.getComments = async (req, res) => {
   }
 };
 
+// 댓글 저장
 exports.storeComment = async (req, res) => {
   const { memberId, communityId, isCommentForComment, parentComment, detail } =
     req.body;
@@ -228,6 +285,7 @@ exports.storeComment = async (req, res) => {
   }
 };
 
+// 좋아요 추가
 exports.like = async (req, res) => {
   const { memberId } = req.body;
   const { communityId } = req.params;
@@ -253,6 +311,7 @@ exports.like = async (req, res) => {
   }
 };
 
+// 좋아요 취소
 exports.unlike = async (req, res) => {
   const { memberId } = req.body;
   const { communityId } = req.params;
