@@ -1,4 +1,4 @@
-import 'package:dasamo/src/controllers/comments_contoller.dart';
+import 'package:dasamo/src/controllers/comments_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

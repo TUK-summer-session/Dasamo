@@ -1,4 +1,4 @@
-import 'package:dasamo/src/controllers/comments_contoller.dart';
+import 'package:dasamo/src/controllers/comments_controller.dart';
 import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +81,7 @@ class _CommunityPageState extends State<CommunityPage> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
-                                  image: AssetImage(comment['profileImage']),
+                                  image: AssetImage(comment['profileImageUrl']),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -92,14 +92,14 @@ class _CommunityPageState extends State<CommunityPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    comment['author'],
+                                    comment['name'],
                                     style: TextStyle(
                                       fontSize: 20,
                                     ),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    comment['date'],
+                                    comment['createdAt'],
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: Colors.grey,
@@ -120,7 +120,7 @@ class _CommunityPageState extends State<CommunityPage> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(comment['image']),
+                        image: AssetImage(comment['imageUrl']),
                         fit: BoxFit.cover,
                       ),
                       boxShadow: [
@@ -154,7 +154,7 @@ class _CommunityPageState extends State<CommunityPage> {
                                 });
                                 print('heart 아이콘을 탭했습니다.');
                               },
-                              child: _favoriteTapped
+                              child: comment['isLiked']
                                   ? Icon(
                                       Icons.favorite,
                                       color: Colors.red,
@@ -205,7 +205,7 @@ class _CommunityPageState extends State<CommunityPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ExpandText(
-                          text: comment['text'],
+                          text: comment['detail'],
                           style: TextStyle(
                             fontSize: 15,
                           ),
