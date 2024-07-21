@@ -17,7 +17,7 @@ List<Map<String, dynamic>> communityData = [
     "memberId": 34234,
     "name": "작성자",
     "profileImageUrl": "assets/images/profile.jpg",
-    "communityId": 1234,
+    "communityId": 22,
     "imageUrl": "assets/images/salad.jpg",
     "detail":
         "이 글 정말 좋네요! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라",
@@ -29,7 +29,7 @@ List<Map<String, dynamic>> communityData = [
     "memberId": 34234,
     "name": "작성자",
     "profileImageUrl": "assets/images/profile.jpg",
-    "communityId": 1234,
+    "communityId": 33,
     "imageUrl": "assets/images/salad.jpg",
     "detail":
         "이 글 정말 좋네요! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라! 샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라샬라샬라샤랄랴살샤ㅏㄹㄹ샤ㅏㄹ샬샬라샬라",
