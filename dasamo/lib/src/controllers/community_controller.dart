@@ -1,30 +1,49 @@
-// lib/src/controllers/comments_controller.dart
-
-import 'package:dasamo/src/shared/community_data.dart';
+import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 class CommunityController extends GetxController {
-  RxList<Map<String, dynamic>> communityList = <Map<String, dynamic>>[].obs;
+  var communityData = <Map<String, dynamic>>[].obs; // 데이터를 직접 저장하는 리스트
 
   @override
   void onInit() {
     super.onInit();
-    _fetchCommunity();
+    fetchCommunityData();
   }
 
-  void _fetchCommunity() {
-    communityList.assignAll(communityData);
-  }
+  Future<void> fetchCommunityData() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://10.0.2.2:3000/api/community'));
 
-  void addComment(Map<String, dynamic> community) {
-    communityList.add(community);
-  }
+      print('Response status!!: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
-  void updateComment(int index, Map<String, dynamic> community) {
-    communityList[index] = community;
-  }
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final communities = (data['communities'] as List).map((community) {
+          return {
+            'communityId': community['communityId'],
+            'detail': community['detail'],
+            'createdAt': community['createdAt'],
+            'updatedAt': community['updatedAt'],
+            'member': {
+              'memberId': community['member']['memberId'],
+              'email': community['member']['email'],
+              'name': community['member']['name'],
+              'profileImageUrl': community['member']['profileImageUrl'] ??
+                  'https://via.placeholder.com/150',
+            }
+          };
+        }).toList();
 
-  void deleteComment(int index) {
-    communityList.removeAt(index);
+        print('Parsed communities: $communities');
+        communityData.assignAll(communities); // 데이터를 리스트에 할당
+      } else {
+        print('Failed to load communities');
+      }
+    } catch (e) {
+      print('Error fetching communities: $e');
+    }
   }
 }
