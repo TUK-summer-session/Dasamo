@@ -57,12 +57,43 @@ const getQuestionCount = async (feedId) => {
     return result.count;
 };
 
+const getReviewImageByReviewId = async (reviewId) => {
+    const imageUrlResult = await db.query('SELECT url FROM ReviewImage WHERE ReviewImage.reviewId = ?', [reviewId]);
+    let imageUrl = null;
+    if (imageUrlResult.length > 0) {
+        imageUrl = imageUrlResult[0].url;
+    }
+    return imageUrl;
+};
+
+
+
 const searchProducts = async (brandSearch, productSearch) => {
     const products = await db.query(
         'SELECT productId, name, brand FROM Product WHERE brand LIKE ? AND name LIKE ?',
         [`%${brandSearch}%`, `%${productSearch}%`]
     );
     return products;
+};
+
+const deleteReviewById = async (reviewId) => {
+    await db.query('DELETE FROM Review WHERE reviewId = ?', [reviewId]);
+};
+
+const deleteSelectedTagsByReviewId = async (reviewId) => {
+    await db.query('DELETE FROM SelectedTag WHERE reviewId = ?', [reviewId]);
+};
+
+const deleteLikesByReviewId = async (reviewId) => {
+    await db.query('DELETE FROM `Like` WHERE feedId = ?', [reviewId]);
+};
+
+const deleteScrapsByReviewId = async (reviewId) => {
+    await db.query('DELETE FROM Scrap WHERE feedId = ?', [reviewId]);
+};
+
+const deleteImageByReviewId = async (reviewId) => {
+    await db.query('DELETE FROM ReviewImage WHERE reviewId = ?', [reviewId]);
 };
 
 
@@ -76,5 +107,11 @@ module.exports = {
     getScrapState,
     getLikeCount,
     getQuestionCount,
-    searchProducts
+    getReviewImageByReviewId,
+    searchProducts,
+    deleteReviewById,
+    deleteSelectedTagsByReviewId,
+    deleteLikesByReviewId,
+    deleteScrapsByReviewId,
+    deleteImageByReviewId
 };

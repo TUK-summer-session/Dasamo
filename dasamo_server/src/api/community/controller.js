@@ -14,6 +14,7 @@ exports.index = async (req, res) => {
 
 exports.store = (req, res) => {
     res.send('Store community post');
+    
 };
 
 exports.uploadImage = (req, res) => {

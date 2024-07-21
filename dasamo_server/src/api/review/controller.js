@@ -5,10 +5,10 @@ const repository = require('./repository');
 exports.index = async (req, res) => {
     try {
         // Review 테이블에서 모든 리뷰 가져옴(임시)
-        const reviews = await db.query('SELECT * FROM Review');
+        const reviews = await db.query('SELECT * FROM Review ORDER BY createdAt DESC');     // 최신순으로
 
         const data = await Promise.all(reviews.map(async review => {
-            const imageUrlResult = await db.query('SELECT url FROM ReviewImage WHERE `order` = 1 AND ReviewImage.reviewId = ?', [review.reviewId]);
+            const imageUrlResult = await db.query('SELECT url FROM ReviewImage WHERE ReviewImage.reviewId = ?', [review.reviewId]);
             let imageUrl = null;
             if (imageUrlResult.length > 0) {
                 imageUrl = imageUrlResult[0].url;
@@ -59,8 +59,48 @@ exports.products = async (req, res) => {
     }
 };
 
-exports.store = (req, res) => {
-    res.send('Store review');
+exports.store = async (req, res) => {
+    console.log('Store Review')
+    const { memberId, title, detail, productId, score, tagIds } = req.body;
+    const file = req.file;
+
+    try {
+        // 1. Review 객체 생성
+        const result = await db.query(
+            'INSERT INTO Review (memberId, title, detail, productId, score, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
+            [memberId, title, detail, productId, score]
+        );
+        
+        const reviewId = result.insertId;
+
+        // 2. SelectedTag 객체 생성
+        const tags = tagIds.split('/');
+        for (const tagId of tags) {
+            await db.query(
+                'INSERT INTO SelectedTag (reviewId, tagId) VALUES (?, ?)',
+                [reviewId, tagId]
+            );
+        }
+
+        // 3. ReviewImage 객체 생성
+        if (file) {
+            await db.query(
+                'INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)',
+                ["https://img1.daumcdn.net/thumb/R658x0.q70/?fname=https://t1.daumcdn.net/news/202105/21/dailylife/20210521220226237nxoo.jpg", reviewId] // 원래는 [file.path, reviewId] 로 s3업로드 url을 주지만 일단 임시 url 넣음, 콩 나오면 성공
+            );
+        } else {
+            await db.query(
+                'INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)',
+                ["https://cdn.pixabay.com/photo/2016/09/20/07/25/food-1681977_1280.png", reviewId] // 사과 넣으면 파일 업로드 실패
+            );
+        }
+
+        const response = createResponse(200, '리뷰가 성공적으로 생성되었습니다.', { reviewId });
+        res.send(response);
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
 };
 
 exports.uploadImage = (req, res) => {
@@ -92,7 +132,11 @@ exports.getDetail = async (req, res) => {
             return;
         }
 
-        // 2. search product
+        // 2. reviewImage
+        const reviewImageUrl = await repository.getReviewImageByReviewId(reviewId);
+        console.log(reviewImageUrl);
+
+        // 3. search product
         const [product] = await db.query(
             `SELECT * FROM Product WHERE productId = ?`,
             [reviewDetail.productId]
@@ -119,7 +163,6 @@ exports.getDetail = async (req, res) => {
             'SELECT state FROM `Like` WHERE memberId = ? AND feedId = ? AND likeType = ?',
             [memberId, reviewId, 0]
         );
-        console.log(like);
 
         const scrap = await db.query(
             `SELECT state FROM Scrap WHERE memberId = ? AND feedId = ?`,
@@ -140,9 +183,10 @@ exports.getDetail = async (req, res) => {
                 reviewId: reviewDetail.reviewId,
                 title: reviewDetail.title,
                 detail: reviewDetail.detail,
+                imageUrl: reviewImageUrl,
                 score: reviewDetail.score,
-                isLiked: like && like[0].state === 1,
-                isScraped: scrap && scrap[0].state === 1,
+                isLiked: like.length > 0 && like[0].state === 1,
+                isScraped: scrap.length > 0 && scrap[0].state === 1,
                 likeCount: likeCount,
                 questionCount: questionCount,
                 tags: tags,
@@ -160,8 +204,35 @@ exports.getDetail = async (req, res) => {
     }
 };
 
-exports.delete = (req, res) => {
-    res.send(`Delete review ${req.params.reviewId}`);
+exports.delete = async (req, res) => {
+    console.log(`Delete review ${req.params.reviewId}`);
+    const { memberId } = req.body;
+    const reviewId = req.params.reviewId;
+
+    try {
+        // 리뷰의 memberId 사용자와 일치?
+        const [review] = await db.query('SELECT * FROM Review WHERE reviewId = ? AND memberId = ?', [reviewId, memberId]);
+        if (!review) {
+            console.log('Review not found or you do not have permission to delete this review.');
+            return res.status(404).send(createResponse(404, '리뷰를 찾을 수 없거나 삭제 권한이 없습니다.'));
+        }
+
+        // 삭제 로직
+        await repository.deleteLikesByReviewId(reviewId);
+        await repository.deleteScrapsByReviewId(reviewId);
+        await repository.deleteReviewById(reviewId);
+        await repository.deleteImageByReviewId(reviewId);
+        await repository.deleteSelectedTagsByReviewId(reviewId);
+
+        const response = createResponse(200, '리뷰가 성공적으로 삭제되었습니다.');
+        res.send(response);
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
+
+    
+
 };
 
 exports.update = (req, res) => {

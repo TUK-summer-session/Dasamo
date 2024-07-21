@@ -30,7 +30,7 @@ router.post('/api/members/notice', apiMemberController.clearNotice);
 // Review APIs
 router.get('/api/reviews', apiReviewController.index);
 router.get('/api/reviews/products', apiReviewController.products);
-router.post('/api/reviews', apiReviewController.store);
+router.post('/api/reviews', upload.single('file'), apiReviewController.store);
 router.post('/api/reviews/image', apiReviewController.uploadImage);
 router.delete('/api/reviews/image', apiReviewController.deleteImage);
 router.get('/api/reviews/:reviewId', apiReviewController.getDetail);
