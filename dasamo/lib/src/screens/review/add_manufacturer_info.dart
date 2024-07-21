@@ -1,4 +1,5 @@
-import 'package:dasamo/src/widgets/Input/separate_text_field.dart';
+
+import 'package:dasamo/src/widgets/comment/separate_text_field.dart';
 import 'package:dasamo/src/widgets/listItems/add_goods_item.dart';
 import 'package:flutter/material.dart';
 import 'new_review.dart'; // NewReview 화면 import

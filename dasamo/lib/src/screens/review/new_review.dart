@@ -6,10 +6,10 @@ import 'package:dasamo/src/shared/tag_data.dart';
 import 'package:dasamo/src/widgets/buttons/tags/select_tag_button.dart';
 import 'package:dasamo/src/widgets/list/star_list_widget.dart';
 import 'package:dasamo/src/widgets/modal/more_bottom_modal.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dotted_border/dotted_border.dart';
 
 class NewReview extends StatefulWidget {
   final String manufacturer;
