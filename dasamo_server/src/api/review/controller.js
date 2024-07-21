@@ -1,5 +1,6 @@
 const db = require('../../config/dbConfig');
 const createResponse = require('../../utils/response');
+const repository = require('./repository');
 
 exports.index = async (req, res) => {
     try {
@@ -37,8 +38,25 @@ exports.index = async (req, res) => {
 };
 
 
-exports.products = (req, res) => {
-    res.send('Product list');
+exports.products = async (req, res) => {
+    console.log('Product list');
+
+    const { brandSearch, productSearch } = req.body;
+
+    try {
+        const products = await repository.searchProducts(brandSearch, productSearch);
+        const formattedProducts = products.map(product => ({
+            productId: product.productId,
+            productName: product.name,
+            brandName: product.brand
+        }));
+        
+        const response = createResponse(200, '제품 리스트가 성공적으로 반환되었습니다.', { products: formattedProducts });
+        res.send(response);
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
 };
 
 exports.store = (req, res) => {
