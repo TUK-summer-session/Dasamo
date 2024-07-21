@@ -1,9 +1,9 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/mypage_modal.dart';
-import 'package:flutter/material.dart';
 import 'package:dasamo/src/controllers/my_page_tab_controller.dart';
-import 'package:dasamo/src/shared/tab_data.dart';
+import 'package:dasamo/src/shared/my_page_data.dart'; // 데이터를 가져오기 위해
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -15,19 +15,40 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   final MyPageTabController controller = MyPageTabController();
 
+  // 프로필 정보
+  late final ImageProvider _defaultImage;
+  late String _userName;
+
   // 프로필 정보 - 이미지 업로드
   File? _selectedImage;
-  final ImageProvider _defaultImage = AssetImage('assets/images/profile.jpg');
 
-  // 프로필 정보 - 이름
-  String _userName = '작성자'; // 기본 사용자 이름
+  @override
+  void initState() {
+    super.initState();
+    // 데이터에서 프로필 정보 초기화
+    _defaultImage = AssetImage(myPageDataList['profile']['profileImageUrl']);
+    _userName = myPageDataList['profile']['name'];
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double barWidth = screenWidth / tabDataList.length;
+    double barWidth = screenWidth / 3; // 3개의 탭 중 선택된 탭의 위치에 맞게 조정
     double barPosition = barWidth * controller.selectedIndex;
-    final currentTabData = tabDataList[controller.selectedIndex];
+    int adjustedIndex = (controller.selectedIndex) % 3;
+
+    // 현재 선택된 탭의 데이터
+    List<Map<String, dynamic>> currentTabData;
+    if (adjustedIndex == 0) {
+      currentTabData =
+          List<Map<String, dynamic>>.from(myPageDataList['scraps']);
+    } else if (adjustedIndex == 1) {
+      currentTabData =
+          List<Map<String, dynamic>>.from(myPageDataList['reviews']);
+    } else {
+      currentTabData =
+          List<Map<String, dynamic>>.from(myPageDataList['communities']);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -60,14 +81,16 @@ class _MyPageState extends State<MyPage> {
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: GestureDetector(
-                      onTap: _showProfileModal,
+                      onTap: () {
+                        _showProfileModal();
+                      },
                       child: Container(
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: AssetImage('assets/images/profile.jpg'),
+                            image: _defaultImage,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -91,7 +114,6 @@ class _MyPageState extends State<MyPage> {
                 ],
               ),
             ),
-
             // 텍스트 및 바
             Container(
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -111,19 +133,17 @@ class _MyPageState extends State<MyPage> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Row(
-                      children: tabDataList.asMap().entries.map((entry) {
-                        return _buildTab(
-                          entry.value.title,
-                          entry.key,
-                        );
-                      }).toList(),
+                      children: [
+                        _buildTab('내 리뷰', 0),
+                        _buildTab('내 운동', 1),
+                        _buildTab('스크랩', 2),
+                      ],
                     ),
                   )
                 ],
               ),
             ),
-
-            // 추가 이미지나 콘텐츠
+            // 이미지 그리드
             GridView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -131,12 +151,14 @@ class _MyPageState extends State<MyPage> {
                 crossAxisCount: 3,
                 childAspectRatio: 1,
               ),
-              itemCount: currentTabData.images.length,
+              itemCount: currentTabData.length,
               itemBuilder: (context, index) {
+                String imageUrl = currentTabData[index]['imageUrl'];
+
                 return Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(currentTabData.images[index]),
+                      image: AssetImage(imageUrl),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -151,7 +173,7 @@ class _MyPageState extends State<MyPage> {
 
   Widget _buildTab(String title, int index) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double tabWidth = screenWidth / tabDataList.length;
+    double tabWidth = screenWidth / 3; // 3개의 탭에 맞춰 조정
 
     return GestureDetector(
       onTap: () {

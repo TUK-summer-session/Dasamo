@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/review_controller.dart';
+import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/screens/review/add_manufacturer_info.dart';
 import 'package:dasamo/src/widgets/buttons/tags/tag_button.dart';
 import 'package:dasamo/src/widgets/listItems/review_list_item.dart';
@@ -45,8 +46,14 @@ class _ReviewIndexState extends State<ReviewIndex> {
         title: const Text('리뷰'),
         actions: [
           IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.notifications_none_outlined))
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AlarmPage()),
+              );
+            },
+            icon: const Icon(Icons.notifications_none_outlined),
+          ),
         ],
       ),
       body: Column(
