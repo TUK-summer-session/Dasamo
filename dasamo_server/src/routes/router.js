@@ -47,8 +47,8 @@ router.delete('/api/reviews/scrap/:reviewId', apiReviewController.unscrap);
 // Community APIs
 router.get('/api/community', apiCommunityController.index);
 router.post('/api/community', apiCommunityController.store);
-router.post('/api/community/image', apiCommunityController.uploadImage);
-router.delete('/api/community/image', apiCommunityController.deleteImage);
+router.put('/api/community/:communityId', apiCommunityController.update);
+router.delete('/api/community/image', apiCommunityController.deleteCommunity);
 router.get('/api/community/comments/:communityId', apiCommunityController.getComments);
 router.post('/api/community/comments/:communityId', apiCommunityController.storeComment);
 router.post('/api/community/like/:communityId', apiCommunityController.like);
