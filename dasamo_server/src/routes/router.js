@@ -33,7 +33,7 @@ router.get('/api/reviews/products', apiReviewController.products);
 router.post('/api/reviews', apiReviewController.store);
 router.post('/api/reviews/image', apiReviewController.uploadImage);
 router.delete('/api/reviews/image', apiReviewController.deleteImage);
-router.get('/api/reviews/:reviewId', apiReviewController.show);
+router.get('/api/reviews/:reviewId', apiReviewController.getDetail);
 router.delete('/api/reviews/:reviewId', apiReviewController.delete);
 router.put('/api/reviews/:reviewId', apiReviewController.update);
 router.get('/api/reviews/questions/:reviewId', apiReviewController.getComments);

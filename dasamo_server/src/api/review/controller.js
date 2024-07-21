@@ -15,7 +15,7 @@ exports.index = async (req, res) => {
             const tags = await db.query('SELECT name FROM Tag JOIN SelectedTag ON Tag.tagId = SelectedTag.tagId WHERE SelectedTag.reviewId = ?', [review.reviewId]);
             const tagNames = tags.map((tag, index) => tag.name + (index < tags.length - 1 ? '/' : '')).join(''); // 마지막 태그는 / 삭제
             const likeCount = await db.query('SELECT COUNT(*) AS count FROM `Like` WHERE feedId = ? AND state = 1', [review.reviewId]);
-            const questionCount = await db.query('SELECT COUNT(*) AS count FROM Scrab WHERE feedId = ? AND state = 1', [review.reviewId]);
+            const questionCount = await db.query('SELECT COUNT(*) AS count FROM Question WHERE reviewId = ?', [review.reviewId]);
 
             return {
                 reviewId: review.reviewId,
@@ -53,8 +53,93 @@ exports.deleteImage = (req, res) => {
     res.send('Delete review image');
 };
 
-exports.show = (req, res) => {
-    res.send(`Show review ${req.params.reviewId}`);
+
+exports.getDetail = async (req, res) => {
+    console.log(`Detail review ${req.params.reviewId}`);
+    const { memberId } = req.body;
+    console.log(`memberId ${memberId}`);
+    const reviewId = req.params.reviewId;
+
+    try {
+
+        // 1. review 객체 찾기
+        let [reviewDetail] = await db.query(
+            `SELECT * FROM Review WHERE reviewId = ?`,
+            [reviewId]
+        );
+        console.log(reviewDetail);  // 체크
+
+        if (!reviewDetail) {
+            console.log('No rows returned from query');
+            return;
+        }
+
+        // 2. search product
+        const [product] = await db.query(
+            `SELECT * FROM Product WHERE productId = ?`,
+            [reviewDetail.productId]
+        );
+
+        console.log(product);
+        if (product.length === 0) {
+            console.log('No product found with the given productId');
+            return res.status(404).send(createResponse);
+        }
+
+
+        const [writer] = await db.query(
+            `SELECT memberId, profileImageUrl FROM Member WHERE memberId = ?`,
+            [reviewDetail.memberId]
+        );
+
+        const tagRows = await db.query('SELECT name FROM Tag JOIN SelectedTag ON Tag.tagId = SelectedTag.tagId WHERE SelectedTag.reviewId = ?', [reviewId]);
+        const tags = tagRows.map((tag, index) => tag.name + (index < tagRows.length - 1 ? '/' : '')).join(''); // 마지막 태그는 / 삭제
+        console.log(tags)
+
+
+        const like = await db.query(
+            'SELECT state FROM `Like` WHERE memberId = ? AND feedId = ? AND likeType = ?',
+            [memberId, reviewId, 0]
+        );
+        console.log(like);
+
+        const scrap = await db.query(
+            `SELECT state FROM Scrap WHERE memberId = ? AND feedId = ?`,
+            [memberId, reviewId]
+        );
+
+        const likeCountResult = await db.query(
+            'SELECT COUNT(*) AS count FROM `Like` WHERE feedId = ? AND state = 1 AND likeType = 0',
+            [reviewId]
+        );
+        const likeCount = likeCountResult[0].count;
+        const questionCountResult = await db.query('SELECT COUNT(*) AS count FROM Scrap WHERE feedId = ? AND state = 1', [reviewId]);
+        const questionCount = questionCountResult[0].count;
+
+
+        const response = createResponse(200, '요청이 성공적으로 처리되었습니다.', {
+            reviewDetail: {
+                reviewId: reviewDetail.reviewId,
+                title: reviewDetail.title,
+                detail: reviewDetail.detail,
+                score: reviewDetail.score,
+                isLiked: like && like[0].state === 1,
+                isScraped: scrap && scrap[0].state === 1,
+                likeCount: likeCount,
+                questionCount: questionCount,
+                tags: tags,
+                createdAt: reviewDetail.createdAt,
+                updatedAt: reviewDetail.updatedAt
+            },
+            product,
+            writer
+        });
+
+        res.send(response);
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
 };
 
 exports.delete = (req, res) => {
