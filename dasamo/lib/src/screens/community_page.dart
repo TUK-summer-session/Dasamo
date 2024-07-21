@@ -1,3 +1,4 @@
+import 'package:dasamo/src/screens/new_community.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
@@ -29,7 +30,12 @@ class _CommunityPageState extends State<CommunityPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'addTag2',
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewCommunity()),
+          );
+        },
         backgroundColor: Color.fromRGBO(175, 99, 120, 1),
         child: Icon(
           Icons.add,
