@@ -215,7 +215,7 @@ class _AddManufacturerInfoState extends State<AddManufacturerInfo> {
                 ? Color.fromRGBO(175, 99, 120, 1.0) // 활성화 상태 색상
                 : Color.fromRGBO(175, 99, 120, 0.43), // 비활성화 상태 색상
           ),
-          child: Text('다음'),
+          child: const Text('다음'),
         ),
       ],
     );

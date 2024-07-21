@@ -1,6 +1,6 @@
 import 'package:dasamo/src/screens/review/show.dart';
 import 'package:flutter/material.dart';
-import 'package:dasamo/src/widgets/buttons/review_tag_button.dart';
+import 'package:dasamo/src/widgets/buttons/tags/review_tag_button.dart';
 import 'package:get/get.dart';
 
 const double _imageSize = 90;

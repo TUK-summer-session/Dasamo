@@ -1,5 +1,5 @@
 import 'package:dasamo/src/controllers/goods_controller.dart';
-import 'package:dasamo/src/widgets/buttons/review_tag_button.dart';
+import 'package:dasamo/src/widgets/buttons/tags/review_tag_button.dart';
 import 'package:dasamo/src/widgets/icons/bookmark_icon.dart';
 import 'package:dasamo/src/widgets/icons/comment_icon.dart';
 import 'package:dasamo/src/widgets/icons/heart_icon.dart';

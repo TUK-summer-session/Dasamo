@@ -18,7 +18,7 @@ class AddGoodsItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: isSelected
-            ? Color.fromRGBO(175, 99, 120, 0.43)
+            ? Color.fromRGBO(175, 99, 120, 0.1)
             : Colors.white, // 선택된 아이템 색상 변경
         border: Border.all(
           color: Colors.grey, // 테두리 색상

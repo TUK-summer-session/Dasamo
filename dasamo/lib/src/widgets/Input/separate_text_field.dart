@@ -15,7 +15,12 @@ class SeparateTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        border: UnderlineInputBorder(), // 하단에만 border 추가
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(width: 1, color: Colors.black),
+        ),
+        focusedBorder: UnderlineInputBorder(
+            borderSide:
+                BorderSide(width: 1, color: Color.fromRGBO(175, 99, 120, 1))),
         hintText: hintText,
       ),
     );

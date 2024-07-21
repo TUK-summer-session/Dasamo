@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:dasamo/src/controllers/review_controller.dart';
 import 'package:dasamo/src/screens/review/add_manufacturer_info.dart';
 import 'package:dasamo/src/shared/tag_data.dart';
-import 'package:dasamo/src/widgets/buttons/tag_button.dart';
+import 'package:dasamo/src/widgets/buttons/tags/tag_button.dart';
 import 'package:dasamo/src/widgets/listItems/review_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

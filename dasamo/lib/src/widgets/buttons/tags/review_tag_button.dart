@@ -9,7 +9,7 @@ class ReviewTagButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+        padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 2),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),

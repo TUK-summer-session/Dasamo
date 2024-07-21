@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
               fontSize: 24,
             ),
             foregroundColor: Colors.black,
-            minimumSize: const Size(340, 48),
+            minimumSize: const Size(360, 48),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
