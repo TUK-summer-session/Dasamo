@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/mypage_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:dasamo/src/controllers/my_page_tab_controller.dart';
@@ -36,9 +37,14 @@ class _MyPageState extends State<MyPage> {
         title: const Text('마이페이지'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AlarmPage()),
+              );
+            },
             icon: const Icon(Icons.notifications_none_outlined),
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(

@@ -1,5 +1,6 @@
 // 홈 페이지 위젯
 import 'package:dasamo/src/controllers/review_controller.dart';
+import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/shared/tag_data.dart';
 import 'package:dasamo/src/widgets/buttons/tag_button.dart';
 import 'package:dasamo/src/widgets/listItems/review_list_item.dart';
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        heroTag: 'addTag1',
         onPressed: () {},
         backgroundColor: Color.fromRGBO(175, 99, 120, 1),
         child: Icon(
@@ -40,8 +42,14 @@ class _HomePageState extends State<HomePage> {
         title: const Text('리뷰'),
         actions: [
           IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.notifications_none_outlined))
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AlarmPage()),
+              );
+            },
+            icon: const Icon(Icons.notifications_none_outlined),
+          ),
         ],
       ),
       body: Column(

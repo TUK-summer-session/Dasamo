@@ -1,4 +1,5 @@
 import 'package:dasamo/src/controllers/comments_contoller.dart';
+import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,6 +32,7 @@ class _CommunityPageState extends State<CommunityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        heroTag: 'addTag2',
         onPressed: () {},
         backgroundColor: Color.fromRGBO(175, 99, 120, 1),
         child: Icon(
@@ -45,7 +47,12 @@ class _CommunityPageState extends State<CommunityPage> {
         title: const Text('커뮤니티'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AlarmPage()),
+              );
+            },
             icon: const Icon(Icons.notifications_none_outlined),
           ),
         ],
