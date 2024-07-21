@@ -1,11 +1,10 @@
-import 'package:dasamo/src/controllers/comments_contoller.dart';
-import 'package:dasamo/src/screens/alarm_page.dart';
-import 'package:dasamo/src/widgets/modal/comment_modal.dart';
+import 'package:dasamo/src/screens/new_community.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
-import 'package:dasamo/src/widgets/comment/comment_input.dart';
-import 'package:dasamo/src/widgets/comment/comments.dart';
+import 'package:dasamo/src/controllers/comments_controller.dart';
+import 'package:dasamo/src/screens/alarm_page.dart';
+import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
 
 class CommunityPage extends StatefulWidget {
@@ -16,15 +15,13 @@ class CommunityPage extends StatefulWidget {
 }
 
 class _CommunityPageState extends State<CommunityPage> {
-  // 아이콘 hover
-  bool _favoriteHovered = false;
-  bool _favoriteTapped = false;
-
-  bool _commentHovered = false;
-  bool _commentTapped = false;
+  // 각 댓글에 대해 개별적으로 호버 상태를 관리하는 변수
+  final Map<int, bool> _favoriteHovered =
+      {}; // key: 댓글의 communityId, value: 호버 상태
+  final Map<int, bool> _commentHovered =
+      {}; // key: 댓글의 communityId, value: 호버 상태
 
   final CommentsController commentsController = Get.put(CommentsController());
-
   final CommunityController communityController =
       Get.put(CommunityController());
 
@@ -33,7 +30,12 @@ class _CommunityPageState extends State<CommunityPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'addTag2',
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewCommunity()),
+          );
+        },
         backgroundColor: Color.fromRGBO(175, 99, 120, 1),
         child: Icon(
           Icons.add,
@@ -63,6 +65,8 @@ class _CommunityPageState extends State<CommunityPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: communityController.communityList.map((comment) {
+              final int communityId = comment['communityId']; // 댓글의 고유 ID
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -81,7 +85,7 @@ class _CommunityPageState extends State<CommunityPage> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
-                                  image: AssetImage(comment['profileImage']),
+                                  image: AssetImage(comment['profileImageUrl']),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -92,14 +96,14 @@ class _CommunityPageState extends State<CommunityPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    comment['author'],
+                                    comment['name'],
                                     style: TextStyle(
                                       fontSize: 20,
                                     ),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    comment['date'],
+                                    comment['createdAt'],
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: Colors.grey,
@@ -120,7 +124,7 @@ class _CommunityPageState extends State<CommunityPage> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(comment['image']),
+                        image: AssetImage(comment['imageUrl']),
                         fit: BoxFit.cover,
                       ),
                       boxShadow: [
@@ -145,33 +149,35 @@ class _CommunityPageState extends State<CommunityPage> {
                             InkWell(
                               onHover: (hovered) {
                                 setState(() {
-                                  _favoriteHovered = hovered;
+                                  _favoriteHovered[communityId] = hovered;
                                 });
                               },
                               onTap: () {
                                 setState(() {
-                                  _favoriteTapped = !_favoriteTapped;
+                                  // Toggle the 'isLiked' status
+                                  comment['isLiked'] =
+                                      !(comment['isLiked'] ?? false);
                                 });
                                 print('heart 아이콘을 탭했습니다.');
                               },
-                              child: _favoriteTapped
-                                  ? Icon(
-                                      Icons.favorite,
-                                      color: Colors.red,
-                                    )
-                                  : Icon(
-                                      _favoriteHovered
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color:
-                                          _favoriteHovered ? Colors.red : null,
-                                    ),
+                              child: Icon(
+                                comment['isLiked'] ?? false
+                                    ? Icons.favorite
+                                    : (_favoriteHovered[communityId] ?? false
+                                        ? Icons.favorite
+                                        : Icons.favorite_border),
+                                color: comment['isLiked'] ?? false
+                                    ? Colors.red
+                                    : (_favoriteHovered[communityId] ?? false
+                                        ? Colors.red
+                                        : null),
+                              ),
                             ),
                             SizedBox(width: 5),
                             InkWell(
                               onHover: (hovered) {
                                 setState(() {
-                                  _commentHovered = hovered;
+                                  _commentHovered[communityId] = hovered;
                                 });
                               },
                               onTap: () {
@@ -184,10 +190,10 @@ class _CommunityPageState extends State<CommunityPage> {
                                 print('Comment 아이콘을 탭했습니다.');
                               },
                               child: Icon(
-                                _commentHovered
+                                _commentHovered[communityId] ?? false
                                     ? Icons.chat_bubble
                                     : Icons.chat_bubble_outline,
-                                color: _commentHovered
+                                color: _commentHovered[communityId] ?? false
                                     ? Color.fromRGBO(175, 99, 120, 1.0)
                                     : null,
                               ),
@@ -205,7 +211,7 @@ class _CommunityPageState extends State<CommunityPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ExpandText(
-                          text: comment['text'],
+                          text: comment['detail'],
                           style: TextStyle(
                             fontSize: 15,
                           ),

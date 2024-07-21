@@ -1,4 +1,4 @@
-import 'package:dasamo/src/controllers/comments_contoller.dart';
+import 'package:dasamo/src/controllers/comments_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/widgets/comment/comment_input.dart';
@@ -48,11 +48,11 @@ class CommentModal extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: CommentInput(
               onSave: (comment) {
-                commentsController.addComment({
-                  'profileImage': 'assets/images/profile.jpg',
-                  'author': 'New User',
-                  'content': comment,
-                });
+                // commentsController.addComment({
+                //   'profileImage': 'assets/images/profile.jpg',
+                //   'author': 'New User',
+                //   'content': comment,
+                // });
                 print('저장된 댓글: $comment');
               },
             ),
