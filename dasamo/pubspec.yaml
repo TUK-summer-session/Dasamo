@@ -75,6 +75,7 @@ flutter:
     - assets/images/sweet_potato2.jpg
     - assets/images/dasamo_logo.svg
     - assets/images/default_profile.svg
+    - assets/config/.env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
