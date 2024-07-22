@@ -277,23 +277,23 @@ exports.storeComment = async (req, res) => {
 };
 
 // 좋아요 추가
-exports.like = async (req, res) => {
-  const { memberId } = req.body;
-  const { communityId } = req.params;
+exports.storeLike = async (req, res) => {
+  const memberId = req.body.memberId;
+  const feedId = req.params.communityId;
 
-  if (!memberId || !communityId) {
+  if (!memberId || !feedId) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
   try {
-    const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, communityId);
+    const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, feedId);
     if (alreadyLiked) {
       return res
         .status(401)
         .send(createResponse(401, "이미 좋아요를 누른 게시글입니다."));
     }
 
-    await repository.likeCommunityPost(memberId, communityId);
+    await repository.likeCommunityPost(memberId, feedId);
     const response = createResponse(200, "커뮤니티 좋아요 성공");
     res.status(200).send(response);
   } catch (error) {
@@ -304,22 +304,22 @@ exports.like = async (req, res) => {
 
 // 좋아요 취소
 exports.unlike = async (req, res) => {
-  const { memberId } = req.body;
-  const { communityId } = req.params;
+  const memberId = req.body.memberId;
+  const feedId = req.params.communityId;
 
-  if (!memberId || !communityId) {
+  if (!memberId || !feedId) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
   try {
-    const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, communityId);
+    const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, feedId);
     if (!alreadyLiked) {
       return res
         .status(401)
         .send(createResponse(401, "이미 좋아요가 해제된 게시글입니다."));
     }
 
-    await repository.unlikeCommunityPost(memberId, communityId);
+    await repository.unlikeCommunityPost(memberId, feedId);
     const response = createResponse(200, "커뮤니티 좋아요 취소 성공");
     res.status(200).send(response);
   } catch (error) {
