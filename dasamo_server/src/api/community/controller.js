@@ -9,12 +9,14 @@ const repository = require('./repository');
 // 커뮤니티 목록 조회
 exports.index = async (req, res) => {
   console.log("Community home");
+  const memberId = req.body.memberId;
   try {
-    const result = await repository.getCommunitiesWithMembers();
+    const result = await repository.getCommunitiesWithMembers(memberId);
 
     const communities = result.map((row) => ({
       communityId: row.communityId,
       detail: row.detail,
+      isLiked: (row.isLiked == 1),
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       member: {
@@ -230,12 +232,8 @@ exports.deleteCommunity = async (req, res) => {
 
 // 댓글 조회
 exports.getComments = async (req, res) => {
-  const communityId = req.params.communityId;
-  const { memberId } = req.body;
-
-  if (!memberId) {
-    return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
-  }
+    const communityIdString = req.params.communityId;
+    const communityId = parseInt(communityIdString, 10);
 
   try {
     const comments = await repository.getCommentsByCommunityId(communityId);
@@ -275,6 +273,29 @@ exports.storeComment = async (req, res) => {
     res.status(500).send(createResponse(500, "서버 에러"));
   }
 };
+
+// 댓글 삭제
+exports.deleteComment = async (req, res) => {
+  const commentId = req.params.commentId;
+  const memberId = req.body.memberId;
+
+  try {
+    const isOwned = await repository.checkCommentOwnership(commentId, memberId);
+    
+    if (!isOwned) {
+      console.log('Comment not found or you do not have permission to delete this comment.');
+      return res.status(404).send(createResponse(404, '댓글을 찾을 수 없거나 삭제 권한이 없습니다.'));
+    }
+
+    await repository.deleteCommentById(commentId);
+    const response = createResponse(200, '댓글을 성공적으로 삭제했습니다.');
+    res.send(response);
+  } catch (error) {
+    console.error('Query error:', error);
+    res.status(500).send(createResponse(500, '서버 오류'));
+  }
+};
+
 
 // 좋아요 추가
 exports.storeLike = async (req, res) => {
