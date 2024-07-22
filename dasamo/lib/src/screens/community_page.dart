@@ -1,6 +1,6 @@
+import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:dasamo/src/screens/new_community.dart';
 import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/comment_modal.dart';
