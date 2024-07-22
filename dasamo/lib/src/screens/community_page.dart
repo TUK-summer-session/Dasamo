@@ -160,28 +160,28 @@ class CommunityPage extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 5),
-                            InkWell(
-                              onTap: () {
-                                final commentsController =
-                                    CommentsController(communityId);
-                                commentsController.fetchComments();
+                            // InkWell(
+                            //   onTap: () {
+                            //     final commentsController =
+                            //         CommentsController(communityId);
+                            //     commentsController.fetchComments();
 
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (context) => CommentModal(
-                                    commentsController: commentsController,
-                                    reviewId: 1234,
-                                  ),
-                                );
-                                print(
-                                    'Comment icon tapped for communityId: $communityId');
-                              },
-                              child: Icon(
-                                Icons.chat_bubble_outline,
-                                color: Colors.grey,
-                              ),
-                            ),
+                            //     showModalBottomSheet(
+                            //       context: context,
+                            //       isScrollControlled: true,
+                            //       builder: (context) => CommentModal(
+                            //         commentsController: commentsController,
+                            //         reviewId: 1234,
+                            //       ),
+                            //     );
+                            //     print(
+                            //         'Comment icon tapped for communityId: $communityId');
+                            //   },
+                            //   child: Icon(
+                            //     Icons.chat_bubble_outline,
+                            //     color: Colors.grey,
+                            //   ),
+                            // ),
                           ],
                         ),
                       ],

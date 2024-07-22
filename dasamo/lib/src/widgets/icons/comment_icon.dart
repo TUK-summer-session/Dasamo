@@ -1,5 +1,5 @@
 import 'package:dasamo/src/widgets/comment/reviews_comment_input.dart';
-import 'package:dasamo/src/widgets/comment/comments.dart';
+import 'package:dasamo/src/widgets/comment/reviews_comments.dart';
 import 'package:flutter/material.dart';
 
 class CommentIcon extends StatefulWidget {
@@ -49,13 +49,13 @@ class _CommentIconState extends State<CommentIcon> {
                     ),
                   ),
                   Expanded(
-                    child: Comments(
+                    child: ReviewsComments(
                       reviewId: 1,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: CommentInput(
+                    child: ReviewsCommentInput(
                       onSave: (comment) {
                         print('저장된 댓글: $comment');
                       },

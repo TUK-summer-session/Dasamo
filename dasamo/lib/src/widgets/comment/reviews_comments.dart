@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
 
-class Comments extends StatelessWidget {
+class ReviewsComments extends StatelessWidget {
   final int reviewId;
 
-  const Comments({required this.reviewId, Key? key}) : super(key: key);
+  const ReviewsComments({required this.reviewId, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final CommentsController commentsController =
-        Get.put(CommentsController(reviewId));
+    final ReviewsCommentsController commentsController =
+        Get.put(ReviewsCommentsController(reviewId));
 
     return Obx(() {
       if (commentsController.commentsList.isEmpty) {

@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-class CommentsController extends GetxController {
+class ReviewsCommentsController extends GetxController {
   RxList<Map<String, dynamic>> commentsList = RxList<Map<String, dynamic>>([]);
   final int reviewId;
 
-  CommentsController(this.reviewId);
+  ReviewsCommentsController(this.reviewId);
 
   @override
   void onInit() {
@@ -54,6 +54,31 @@ class CommentsController extends GetxController {
       }
     } catch (e) {
       print('Exception occurred: $e');
+    }
+  }
+
+  Future<void> postComment(String comment) async {
+    final url =
+        Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$reviewId');
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({
+      "memberId": 1,
+      "isQuestionForQuestion": 0, // false
+      "parentQuestion": null,
+      "detail": comment
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('Comment posted successfully');
+        fetchComments(); // 댓글 목록을 다시 불러옵니다.
+      } else {
+        print('Failed to post comment: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exception occurred while posting comment: $e');
     }
   }
 }
