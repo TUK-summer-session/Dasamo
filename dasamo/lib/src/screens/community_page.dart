@@ -15,6 +15,9 @@ class CommunityPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 데이터 초기 로드
+    communityController.fetchCommunities();
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'addTag2',
@@ -48,7 +51,7 @@ class CommunityPage extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        if (communityController.communityData.isEmpty) {
+        if (communityController.communityList.isEmpty) {
           return Center(
             child: Text('데이터가 없습니다.'),
           );
@@ -57,7 +60,7 @@ class CommunityPage extends StatelessWidget {
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: communityController.communityData.map((community) {
+            children: communityController.communityList.map((community) {
               final int communityId = community['communityId'];
               final member = community['member'];
               final image = community['image'];
@@ -127,7 +130,8 @@ class CommunityPage extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(image['url']),
+                          image: NetworkImage(
+                              'http://10.0.2.2:3000/${image['url']}'),
                           fit: BoxFit.cover,
                         ),
                         boxShadow: [
@@ -162,8 +166,7 @@ class CommunityPage extends StatelessWidget {
                             SizedBox(width: 5),
                             // InkWell(
                             //   onTap: () {
-                            //     final commentsController =
-                            //         CommentsController(communityId);
+                            //     final commentsController = ReviewsCommentsController(communityId);
                             //     commentsController.fetchComments();
 
                             //     showModalBottomSheet(
@@ -171,11 +174,10 @@ class CommunityPage extends StatelessWidget {
                             //       isScrollControlled: true,
                             //       builder: (context) => CommentModal(
                             //         commentsController: commentsController,
-                            //         reviewId: 1234,
+                            //         reviewId: communityId,
                             //       ),
                             //     );
-                            //     print(
-                            //         'Comment icon tapped for communityId: $communityId');
+                            //     print('Comment icon tapped for communityId: $communityId');
                             //   },
                             //   child: Icon(
                             //     Icons.chat_bubble_outline,
