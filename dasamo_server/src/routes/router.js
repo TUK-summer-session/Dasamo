@@ -51,6 +51,7 @@ router.put('/api/community/:communityId', apiCommunityController.update);
 router.delete('/api/community/image', apiCommunityController.deleteCommunity);
 router.get('/api/community/comments/:communityId', apiCommunityController.getComments);
 router.post('/api/community/comments/:communityId', apiCommunityController.storeComment);
+router.delete('/api/community/comments/:commentId', apiCommunityController.deleteComment);
 router.post('/api/community/like/:communityId', apiCommunityController.storeLike);
 router.delete('/api/community/like/:communityId', apiCommunityController.unlike);
 
