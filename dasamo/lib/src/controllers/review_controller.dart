@@ -15,7 +15,7 @@ class ReviewController extends GetxController {
   Future<void> fetchReviews() async {
     try {
       final response =
-          await http.get(Uri.parse('http://localhost:3000/api/reviews'));
+          await http.get(Uri.parse('http://10.0.2.2:3000/api/reviews'));
 
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');

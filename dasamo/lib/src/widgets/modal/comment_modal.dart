@@ -5,12 +5,19 @@ import 'package:dasamo/src/widgets/comment/comment_input.dart';
 import 'package:dasamo/src/widgets/comment/comments.dart';
 
 class CommentModal extends StatelessWidget {
-  const CommentModal({super.key});
+  final int reviewId; // reviewId를 전달받기 위한 필드
+
+  // 생성자에서 reviewId를 받음
+  CommentModal(
+      {super.key,
+      required this.reviewId,
+      required CommentsController commentsController});
 
   @override
   Widget build(BuildContext context) {
+    // reviewId를 사용하여 CommentsController를 초기화
     final CommentsController commentsController =
-        Get.find<CommentsController>();
+        Get.put(CommentsController(reviewId));
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
@@ -39,7 +46,8 @@ class CommentModal extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Comments(), // Comments widget
+                  // Comments 위젯에 reviewId 전달
+                  Comments(reviewId: reviewId),
                 ],
               ),
             ),
@@ -48,11 +56,7 @@ class CommentModal extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: CommentInput(
               onSave: (comment) {
-                // commentsController.addComment({
-                //   'profileImage': 'assets/images/profile.jpg',
-                //   'author': 'New User',
-                //   'content': comment,
-                // });
+                // 댓글 추가 로직 구현
                 print('저장된 댓글: $comment');
               },
             ),

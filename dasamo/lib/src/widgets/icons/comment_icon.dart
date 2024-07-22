@@ -1,6 +1,7 @@
 import 'package:dasamo/src/widgets/comment/comment_input.dart';
 import 'package:dasamo/src/widgets/comment/comments.dart';
 import 'package:flutter/material.dart';
+
 class CommentIcon extends StatefulWidget {
   const CommentIcon({Key? key}) : super(key: key);
 
@@ -51,7 +52,9 @@ class _CommentIconState extends State<CommentIcon> {
                               ),
                             ),
                           ),
-                          Comments(),
+                          Comments(
+                            reviewId: 1,
+                          ),
                         ],
                       ),
                     ),

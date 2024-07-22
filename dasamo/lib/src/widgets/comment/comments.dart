@@ -3,51 +3,36 @@ import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/comments_controller.dart';
 
 class Comments extends StatelessWidget {
-  final CommentsController commentsController = Get.put(CommentsController());
+  final int reviewId; // reviewId를 전달받기 위한 필드
+
+  // 생성자에서 reviewId를 받음
+  Comments({required this.reviewId});
 
   @override
   Widget build(BuildContext context) {
+    // CommentsController를 생성할 때 reviewId를 전달
+    final CommentsController commentsController =
+        Get.put(CommentsController(reviewId));
+
     return Obx(() {
-      return Column(
-        children: commentsController.commentsList.map((comment) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(30.0, 20, 30, 0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage(comment['profileImageUrl']),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(comment['name']),
-                  ],
-                ),
-                SizedBox(width: 20),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 15, 20),
-                    child: Text(
-                      comment['detail'] ??
-                          'No content', // detail이 null일 경우 기본값 설정
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                  ),
-                ),
-              ],
+      if (commentsController.commentsList.isEmpty) {
+        return Center(
+          child: Text('No comments available.'),
+        );
+      }
+
+      return ListView.builder(
+        itemCount: commentsController.commentsList.length,
+        itemBuilder: (context, index) {
+          final comment = commentsController.commentsList[index];
+          return ListTile(
+            title: Text(comment['name']),
+            subtitle: Text(comment['detail']),
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(comment['profileImageUrl']),
             ),
           );
-        }).toList(),
+        },
       );
     });
   }
