@@ -1,28 +1,17 @@
+import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:dasamo/src/screens/new_community.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:dasamo/src/controllers/comments_controller.dart';
 import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
 
-class CommunityPage extends StatefulWidget {
-  const CommunityPage({super.key});
-
-  @override
-  State<CommunityPage> createState() => _CommunityPageState();
-}
-
-class _CommunityPageState extends State<CommunityPage> {
-  // 각 댓글에 대해 개별적으로 호버 상태를 관리하는 변수
-  final Map<int, bool> _favoriteHovered =
-      {}; // key: 댓글의 communityId, value: 호버 상태
-  final Map<int, bool> _commentHovered =
-      {}; // key: 댓글의 communityId, value: 호버 상태
-
-  final CommentsController commentsController = Get.put(CommentsController());
+class CommunityPage extends StatelessWidget {
   final CommunityController communityController =
       Get.put(CommunityController());
+
+  final CommentsController commentsController =
+      Get.put(CommentsController()); // CommentsController 등록
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +38,23 @@ class _CommunityPageState extends State<CommunityPage> {
 
       ),
       body: Obx(() {
+        if (communityController.communityData.isEmpty) {
+          return Center(
+            child: Text('데이터가 없습니다.'),
+          );
+        }
+
         return SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: communityController.communityList.map((comment) {
-              final int communityId = comment['communityId']; // 댓글의 고유 ID
+            children: communityController.communityData.map((community) {
+              final int communityId = community['communityId'];
+              final member = community['member'];
+              final image = community['image'];
+
+              if (member == null) {
+                return SizedBox.shrink(); // member가 null이면 빈 공간 반환
+              }
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,7 +74,8 @@ class _CommunityPageState extends State<CommunityPage> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
-                                  image: AssetImage(comment['profileImageUrl']),
+                                  image: NetworkImage(
+                                      member['profileImageUrl'] ?? ''),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -85,14 +86,14 @@ class _CommunityPageState extends State<CommunityPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    comment['name'],
+                                    member['name'] ?? '',
                                     style: TextStyle(
                                       fontSize: 20,
                                     ),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    comment['createdAt'],
+                                    community['createdAt'] ?? '',
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: Colors.grey,
@@ -107,25 +108,28 @@ class _CommunityPageState extends State<CommunityPage> {
                     ),
                   ),
 
-                  // 리뷰 이미지
-                  Container(
-                    height: 300,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(comment['imageUrl']),
-                        fit: BoxFit.cover,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 0.5,
-                          blurRadius: 3,
-                          offset: Offset(0, 3),
+                  // 커뮤니티 이미지 (옵션)
+                  if (image != null &&
+                      image['url'] != null &&
+                      image['url'].isNotEmpty)
+                    Container(
+                      height: 300,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(image['url']),
+                          fit: BoxFit.cover,
                         ),
-                      ],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 0.5,
+                            blurRadius: 3,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
                   // 하트, 댓글 등
                   Container(
@@ -137,54 +141,36 @@ class _CommunityPageState extends State<CommunityPage> {
                           children: <Widget>[
                             InkWell(
                               onHover: (hovered) {
-                                setState(() {
-                                  _favoriteHovered[communityId] = hovered;
-                                });
+                                // Hover 상태를 처리하는 로직
                               },
                               onTap: () {
-                                setState(() {
-                                  // Toggle the 'isLiked' status
-                                  comment['isLiked'] =
-                                      !(comment['isLiked'] ?? false);
-                                });
-                                print('heart 아이콘을 탭했습니다.');
+                                // 좋아요 클릭 이벤트 처리
+                                print(
+                                    'Heart icon tapped for communityId: $communityId');
                               },
                               child: Icon(
-                                comment['isLiked'] ?? false
-                                    ? Icons.favorite
-                                    : (_favoriteHovered[communityId] ?? false
-                                        ? Icons.favorite
-                                        : Icons.favorite_border),
-                                color: comment['isLiked'] ?? false
-                                    ? Colors.red
-                                    : (_favoriteHovered[communityId] ?? false
-                                        ? Colors.red
-                                        : null),
+                                Icons.favorite_border,
+                                color: Colors.grey, // 기본 색상
                               ),
                             ),
                             SizedBox(width: 5),
                             InkWell(
                               onHover: (hovered) {
-                                setState(() {
-                                  _commentHovered[communityId] = hovered;
-                                });
+                                // Hover 상태를 처리하는 로직
                               },
                               onTap: () {
+                                commentsController.fetchComments();
                                 showModalBottomSheet(
                                   context: context,
                                   isScrollControlled: true,
-                                  builder: (context) =>
-                                      CommentModal(), // CommentModal 사용
+                                  builder: (context) => CommentModal(),
                                 );
-                                print('Comment 아이콘을 탭했습니다.');
+                                print(
+                                    'Comment icon tapped for communityId: $communityId');
                               },
                               child: Icon(
-                                _commentHovered[communityId] ?? false
-                                    ? Icons.chat_bubble
-                                    : Icons.chat_bubble_outline,
-                                color: _commentHovered[communityId] ?? false
-                                    ? Color.fromRGBO(175, 99, 120, 1.0)
-                                    : null,
+                                Icons.chat_bubble_outline,
+                                color: Colors.grey, // 기본 색상
                               ),
                             ),
                           ],
@@ -200,7 +186,7 @@ class _CommunityPageState extends State<CommunityPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ExpandText(
-                          text: comment['detail'],
+                          text: community['detail'] ?? '',
                           style: TextStyle(
                             fontSize: 15,
                           ),

@@ -66,6 +66,33 @@ const getReviewImageByReviewId = async (reviewId) => {
     return imageUrl;
 };
 
+const getQuestionAllByReviewId = async (reviewId) => {
+    const questions = await db.query(`
+        SELECT
+            q.questionId,
+            q.memberId,
+            m.name,
+            m.profileImageUrl,
+            q.isQuestionForQuestion,
+            q.parentQuestion,
+            q.detail,
+            q.createdAt,
+            q.updatedAt
+        FROM Question q
+        JOIN Member m ON q.memberId = m.memberId
+        WHERE q.reviewId = ?
+        ORDER BY q.createdAt DESC
+    `, [reviewId]);
+    return questions;
+};
+
+const storeQuestions = async (createDTO) => {
+    const result = await db.query(
+        'INSERT INTO Question (memberId, reviewId, isQuestionForQuestion, parentQuestion, detail, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
+        [createDTO.memberId, createDTO.reviewId, createDTO.isQuestionForQuestion, createDTO.parentQuestion, createDTO.detail]
+    );
+}
+
 
 
 const searchProducts = async (brandSearch, productSearch) => {
@@ -96,6 +123,14 @@ const deleteImageByReviewId = async (reviewId) => {
     await db.query('DELETE FROM ReviewImage WHERE reviewId = ?', [reviewId]);
 };
 
+const deleteQuestionsByReviewId = async (reviewId) => {
+    await db.query('DELETE FROM Question WHERE reviewId = ?', [reviewId]);
+};
+
+const deleteQuestionById = async (questionId) => {
+    await db.query('DELETE FROM Question WHERE questionId = ?', [questionId]);
+};
+
 
 
 module.exports = {
@@ -107,11 +142,15 @@ module.exports = {
     getScrapState,
     getLikeCount,
     getQuestionCount,
+    getQuestionAllByReviewId,
     getReviewImageByReviewId,
+    storeQuestions,
     searchProducts,
     deleteReviewById,
     deleteSelectedTagsByReviewId,
     deleteLikesByReviewId,
     deleteScrapsByReviewId,
-    deleteImageByReviewId
+    deleteImageByReviewId,
+    deleteQuestionsByReviewId,
+    deleteQuestionById
 };

@@ -1,30 +1,58 @@
-// lib/src/controllers/comments_controller.dart
-
-import 'package:dasamo/src/shared/community_data.dart';
+import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 class CommunityController extends GetxController {
-  RxList<Map<String, dynamic>> communityList = <Map<String, dynamic>>[].obs;
+  var communityData = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-    _fetchCommunity();
+    fetchCommunities();
   }
 
-  void _fetchCommunity() {
-    communityList.assignAll(communityData);
-  }
+  Future<void> fetchCommunities() async {
+    final url = Uri.parse('http://localhost:3000/api/community');
 
-  void addComment(Map<String, dynamic> community) {
-    communityList.add(community);
-  }
+    try {
+      final response = await http.get(url).timeout(Duration(seconds: 10));
 
-  void updateComment(int index, Map<String, dynamic> community) {
-    communityList[index] = community;
-  }
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
-  void deleteComment(int index) {
-    communityList.removeAt(index);
+      if (response.statusCode == 200) {
+        final body = response.body;
+
+        if (body.isNotEmpty) {
+          final jsonResponse = json.decode(body);
+
+          if (jsonResponse is Map<String, dynamic> &&
+              jsonResponse.containsKey('data')) {
+            final data = jsonResponse['data'];
+
+            if (data is Map<String, dynamic> &&
+                data.containsKey('communities')) {
+              final List<dynamic> communities = data['communities'];
+
+              communityData.assignAll(
+                communities
+                    .map((community) => community as Map<String, dynamic>)
+                    .toList(),
+              );
+            } else {
+              print('Error: Data field is not as expected');
+            }
+          } else {
+            print('Error: JSON response is not as expected');
+          }
+        } else {
+          print('Error: Received empty response');
+        }
+      } else {
+        print('Error: Server returned status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 }

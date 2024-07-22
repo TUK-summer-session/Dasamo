@@ -7,10 +7,10 @@ class CommentsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _fetchComments();
+    fetchComments();
   }
 
-  void _fetchComments() {
+  void fetchComments() {
     // commentsData에서 questions 리스트를 가져옵니다.
     final List<Map<String, dynamic>> questions =
         commentsData.isNotEmpty ? commentsData.first['questions'] ?? [] : [];
