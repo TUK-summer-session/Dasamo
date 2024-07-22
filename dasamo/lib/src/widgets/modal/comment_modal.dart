@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dasamo/src/controllers/comments_controller.dart';
-import 'package:dasamo/src/widgets/comment/comment_input.dart';
+import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
+import 'package:dasamo/src/widgets/comment/reviews_comment_input.dart';
 import 'package:dasamo/src/widgets/comment/comments.dart';
 
 class CommentModal extends StatelessWidget {
@@ -42,7 +42,7 @@ class CommentModal extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Comments(reviewId: reviewId), // Comments 위젯에 reviewId를 전달
+            child: Comments(reviewId: 888), // Comments 위젯에 reviewId를 전달
           ),
           Padding(
             padding: const EdgeInsets.all(20.0),

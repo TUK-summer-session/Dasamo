@@ -1,4 +1,4 @@
-import 'package:dasamo/src/widgets/comment/comment_input.dart';
+import 'package:dasamo/src/widgets/comment/reviews_comment_input.dart';
 import 'package:dasamo/src/widgets/comment/comments.dart';
 import 'package:flutter/material.dart';
 

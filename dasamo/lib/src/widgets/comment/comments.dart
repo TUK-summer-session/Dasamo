@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dasamo/src/controllers/comments_controller.dart';
+import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
 
 class Comments extends StatelessWidget {
   final int reviewId;
