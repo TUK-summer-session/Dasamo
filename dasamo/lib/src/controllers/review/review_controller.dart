@@ -1,11 +1,11 @@
-import 'dart:math';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 
 class ReviewController extends GetxController {
   RxList<Map<String, dynamic>> reviewList = <Map<String, dynamic>>[].obs;
   List<Map<String, dynamic>> allReviews = [];
+  RxMap<int, Map<String, dynamic>> reviewDetails = <int, Map<String, dynamic>>{}.obs;
 
   @override
   void onInit() {
@@ -40,6 +40,21 @@ class ReviewController extends GetxController {
       }
     } catch (e) {
       print('Error fetching reviews: $e');
+    }
+  }
+
+  Future<void> fetchReviewData(int reviewId) async {
+    try {
+      final response = await http.get(Uri.parse('http://10.0.2.2:3000/api/reviews/$reviewId'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data'];
+        reviewDetails[reviewId] = data;
+      } else {
+        print('Failed to load review data');
+      }
+    } catch (e) {
+      print('Error fetching review data: $e');
     }
   }
 

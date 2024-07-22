@@ -10,12 +10,17 @@ class ReviewImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // URL이 "http"로 시작하는 경우 네트워크 이미지로 처리
+    final isNetworkImage = imageUrl.startsWith('http');
+
     return Container(
-      height: 300,
+      height: 400,
       width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(imageUrl), // 로컬 이미지
+          image: isNetworkImage
+              ? NetworkImage(imageUrl) as ImageProvider
+              : AssetImage(imageUrl) as ImageProvider,
           fit: BoxFit.cover, // 이미지를 컨테이너 크기에 맞춤
         ),
         boxShadow: [

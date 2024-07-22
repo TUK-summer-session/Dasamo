@@ -15,7 +15,7 @@ class ReviewListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Get.to(() => ReviewShow(reviewItem: item));
+        Get.toNamed('/review/${item['id']}');  // reviewId로 라우팅
       },
       child: Stack(
         children: [
