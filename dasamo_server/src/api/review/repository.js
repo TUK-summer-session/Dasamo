@@ -131,6 +131,36 @@ const deleteQuestionById = async (questionId) => {
     await db.query('DELETE FROM Question WHERE questionId = ?', [questionId]);
 };
 
+const checkIfAlreadyLiked = async (memberId, feedId) => {
+    const result = await db.query("SELECT * FROM `Like` WHERE memberId = ? AND feedId = ? AND `likeType` = 0", [memberId, feedId]);
+    return result.length > 0;
+};
+
+const likeReviewPost = async (memberId, feedId) => {
+    const result = await db.query("INSERT INTO `Like` (memberId, feedId, likeType, state, createdAt) VALUES (?, ?, 0, 1, NOW())", [memberId, feedId]);
+    return result;
+};
+
+const unlikeReviewPost = async (memberId, feedId) => {
+    const result = await db.query("DELETE FROM `Like` WHERE memberId = ? AND feedId = ? AND likeType = 0 AND state = 1", [memberId, feedId]);
+    return result;
+};
+
+const checkIfAlreadyScraped = async (memberId, feedId) => {
+    const result = await db.query("SELECT * FROM Scrap WHERE memberId = ? AND feedId = ?", [memberId, feedId]);
+    return result.length > 0;
+};
+
+const scrapReviewPost = async (memberId, feedId) => {
+    const result = await db.query("INSERT INTO Scrap (memberId, feedId, state, createdAt) VALUES (?, ?, 1, NOW())", [memberId, feedId]);
+    return result;
+};
+
+const unscrapReviewPost = async (memberId, feedId) => {
+    const result = await db.query("DELETE FROM Scrap WHERE memberId = ? AND feedId = ? AND state = 1", [memberId, feedId]);
+    return result;
+};
+
 
 
 module.exports = {
@@ -152,5 +182,11 @@ module.exports = {
     deleteScrapsByReviewId,
     deleteImageByReviewId,
     deleteQuestionsByReviewId,
-    deleteQuestionById
+    deleteQuestionById,
+    checkIfAlreadyLiked,
+    likeReviewPost,
+    unlikeReviewPost,
+    checkIfAlreadyScraped,
+    scrapReviewPost,
+    unscrapReviewPost
 };

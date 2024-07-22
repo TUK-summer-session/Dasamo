@@ -3,22 +3,14 @@ const createResponse = require("../../utils/response");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const {
-  getCommunityById,
-  deleteCommunityById,
-  getCommentsByCommunityId,
-  storeComment,
-  checkIfAlreadyLiked,
-  likeCommunityPost,
-  unlikeCommunityPost,
-  getCommunitiesWithMembers,
-} = require("./repository");
+const repository = require('./repository');
+
 
 // 커뮤니티 목록 조회
 exports.index = async (req, res) => {
   console.log("Community home");
   try {
-    const result = await getCommunitiesWithMembers();
+    const result = await repository.getCommunitiesWithMembers();
 
     const communities = result.map((row) => ({
       communityId: row.communityId,
@@ -205,7 +197,7 @@ exports.deleteCommunity = async (req, res) => {
   }
 
   try {
-    const community = await getCommunityById(communityId);
+    const community = await repository.getCommunityById(communityId);
 
     if (!community) {
       return res
@@ -220,7 +212,7 @@ exports.deleteCommunity = async (req, res) => {
       [communityId]
     );
 
-    await deleteCommunityById(communityId);
+    await repository.deleteCommunityById(communityId);
 
     imagePaths.forEach((image) => {
       if (fs.existsSync(image.url)) {
@@ -238,14 +230,15 @@ exports.deleteCommunity = async (req, res) => {
 
 // 댓글 조회
 exports.getComments = async (req, res) => {
-  const { communityId } = req.body;
+  const communityId = req.params.communityId;
+  const { memberId } = req.body;
 
-  if (!communityId) {
+  if (!memberId) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
   try {
-    const comments = await getCommentsByCommunityId(communityId);
+    const comments = await repository.getCommentsByCommunityId(communityId);
 
     const response = createResponse(200, "요청이 성공적으로 처리되었습니다.", {
       communityId,
@@ -260,20 +253,15 @@ exports.getComments = async (req, res) => {
 
 // 댓글 저장
 exports.storeComment = async (req, res) => {
-  const { memberId, communityId, isCommentForComment, parentComment, detail } =
-    req.body;
+  const communityId = req.params.communityId;
+  const { memberId, isCommentForComment, parentComment, detail } = req.body;
 
-  if (
-    !memberId ||
-    !communityId ||
-    typeof isCommentForComment !== "boolean" ||
-    !detail
-  ) {
+  if ( !memberId || !detail ) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
   try {
-    await storeComment({
+    await repository.storeComment({
       memberId,
       communityId,
       isCommentForComment,
@@ -289,23 +277,23 @@ exports.storeComment = async (req, res) => {
 };
 
 // 좋아요 추가
-exports.like = async (req, res) => {
-  const { memberId } = req.body;
-  const { communityId } = req.params;
+exports.storeLike = async (req, res) => {
+  const memberId = req.body.memberId;
+  const feedId = req.params.communityId;
 
-  if (!memberId || !communityId) {
+  if (!memberId || !feedId) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
   try {
-    const alreadyLiked = await checkIfAlreadyLiked(memberId, communityId);
+    const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, feedId);
     if (alreadyLiked) {
       return res
         .status(401)
         .send(createResponse(401, "이미 좋아요를 누른 게시글입니다."));
     }
 
-    await likeCommunityPost(memberId, communityId);
+    await repository.likeCommunityPost(memberId, feedId);
     const response = createResponse(200, "커뮤니티 좋아요 성공");
     res.status(200).send(response);
   } catch (error) {
@@ -316,22 +304,22 @@ exports.like = async (req, res) => {
 
 // 좋아요 취소
 exports.unlike = async (req, res) => {
-  const { memberId } = req.body;
-  const { communityId } = req.params;
+  const memberId = req.body.memberId;
+  const feedId = req.params.communityId;
 
-  if (!memberId || !communityId) {
+  if (!memberId || !feedId) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
   try {
-    const alreadyLiked = await checkIfAlreadyLiked(memberId, communityId);
+    const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, feedId);
     if (!alreadyLiked) {
       return res
         .status(401)
         .send(createResponse(401, "이미 좋아요가 해제된 게시글입니다."));
     }
 
-    await unlikeCommunityPost(memberId, communityId);
+    await repository.unlikeCommunityPost(memberId, feedId);
     const response = createResponse(200, "커뮤니티 좋아요 취소 성공");
     res.status(200).send(response);
   } catch (error) {
