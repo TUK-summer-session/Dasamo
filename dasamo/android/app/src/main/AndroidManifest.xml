@@ -1,8 +1,29 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.dasamo">
+
+    <!-- 카카오 권한 설정 -->
+    <queries>
+        <package android:name="com.kakao.talk" />
+    </queries>
+
     <application
         android:label="dasamo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+                    <!-- 카카오 로그인 커스텀 URL 스킴 설정 -->
+        <activity
+            android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
+            android:exported="true">
+            <intent-filter android:label="flutter_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- "kakao${YOUR_NATIVE_APP_KEY}://oauth" 형식의 앱 실행 스킴 설정 -->
+                <!-- 카카오 로그인 Redirect URI -->
+                <data android:scheme="kakao1a9fef41917a2d5867d41ac3d7a3f107" android:host="oauth"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -32,8 +53,18 @@
             android:value="2" />
     </application>
 
-    <!-- Internet permission for opening URLs -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+     <!-- 인터넷 사용 권한 설정-->
+     <uses-permission android:name="android.permission.INTERNET" />
+
+     <!-- 카메라 권한 -->
+     <uses-permission android:name="android.permission.CAMERA"/>
+     <!-- 사진 라이브러리 권한 -->
+     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+     
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
 
     <!-- Camera permission -->
     <uses-permission android:name="android.permission.CAMERA"/>
