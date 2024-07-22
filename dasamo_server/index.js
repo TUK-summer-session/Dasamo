@@ -4,7 +4,6 @@ const app = express();
 const cors = require('cors');
 
 // 포트가 딱히 없으면 3000
-const port = process.env.PORT || 3000;
 const path = require('path');
 const router = require('./src/routes/router');
 const bodyParser = require('body-parser');
