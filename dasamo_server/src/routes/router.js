@@ -43,6 +43,7 @@ router.post('/api/reviews/like/:reviewId', apiReviewController.like);
 router.post('/api/reviews/scrap/:reviewId', apiReviewController.scrap);
 router.delete('/api/reviews/like/:reviewId', apiReviewController.unlike);
 router.delete('/api/reviews/scrap/:reviewId', apiReviewController.unscrap);
+router.get('/api/tag', apiReviewController.getTags);
 
 // Community APIs
 router.get('/api/community', apiCommunityController.index);

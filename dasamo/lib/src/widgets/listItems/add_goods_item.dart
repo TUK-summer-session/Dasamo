@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 class AddGoodsItem extends StatelessWidget {
   final String brand;
   final String product;
-  final bool isSelected; // 선택 상태를 나타내는 변수
+  final bool isSelected;
 
   const AddGoodsItem({
     required this.brand,
     required this.product,
-    this.isSelected = false, // 기본값 false
+    this.isSelected = false,
   });
 
   @override
@@ -17,14 +17,12 @@ class AddGoodsItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: isSelected
-            ? Color.fromRGBO(175, 99, 120, 0.1)
-            : Colors.white, // 선택된 아이템 색상 변경
+        color: isSelected ? Color.fromRGBO(175, 99, 120, 0.1) : Colors.white,
         border: Border.all(
-          color: Colors.grey, // 테두리 색상
-          width: 1.0, // 테두리 두께
+          color: Colors.grey,
+          width: 1.0,
         ),
-        borderRadius: BorderRadius.circular(8), // 테두리 모서리 둥글게
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
@@ -35,14 +33,14 @@ class AddGoodsItem extends StatelessWidget {
                 Text(
                   brand,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   product,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     color: Colors.grey[700],
                   ),
                 ),

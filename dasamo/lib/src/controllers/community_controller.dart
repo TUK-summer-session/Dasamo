@@ -12,7 +12,7 @@ class CommunityController extends GetxController {
   }
 
   Future<void> fetchCommunities() async {
-    final url = Uri.parse('http://localhost:3000/api/community');
+    final url = Uri.parse('http://10.0.2.2:3000/api/community');
 
     try {
       final response = await http.get(url).timeout(Duration(seconds: 10));

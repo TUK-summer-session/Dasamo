@@ -1,24 +1,23 @@
+import 'dart:convert';
 import 'dart:io';
-
-import 'package:dasamo/src/home.dart';
-import 'package:dasamo/src/screens/review/index.dart';
-import 'package:dasamo/src/shared/review/tag_data.dart';
-import 'package:dasamo/src/widgets/buttons/tags/select_tag_button.dart';
-import 'package:dasamo/src/widgets/list/star_list_widget.dart';
-import 'package:dasamo/src/widgets/modal/more_bottom_modal.dart';
-import 'package:dotted_border/dotted_border.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dasamo/src/controllers/review/review_controller.dart';
+import 'package:dasamo/src/home.dart';
+import 'package:dasamo/src/models/tag.dart';
+import 'package:dasamo/src/widgets/buttons/tags/select_tag_button.dart';
+import 'package:dasamo/src/widgets/list/star_widget.dart';
+import 'package:dasamo/src/widgets/modal/more_bottom_modal.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 class NewReview extends StatefulWidget {
-  final String manufacturer;
-  final String product;
+  final int? productId;
 
   const NewReview({
     super.key,
-    required this.manufacturer,
-    required this.product,
+    required this.productId,
   });
 
   @override
@@ -33,6 +32,39 @@ class _NewReviewState extends State<NewReview> {
   final ImagePicker _picker = ImagePicker();
 
   List<int> _selectedTags = []; // 선택된 태그 ID 목록
+  List<Tag> tagList = []; // 태그 목록
+  final ReviewController _reviewController = Get.find<ReviewController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTags(); // 태그 데이터를 가져옵니다.
+  }
+
+  Future<void> _fetchTags() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://10.0.2.2:3000/api/tag'));
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> tagsJson = data['data']['tags'];
+        setState(() {
+          tagList = tagsJson.map((json) => Tag.fromJson(json)).toList();
+        });
+      } else {
+        throw Exception('Failed to load tags');
+      }
+    } catch (e) {
+      print('Error fetching tags: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('태그를 불러오는 데 실패했습니다.')),
+      );
+    }
+  }
 
   Future<void> getImage(ImageSource imageSource) async {
     final XFile? pickedFile = await _picker.pickImage(source: imageSource);
@@ -70,6 +102,38 @@ class _NewReviewState extends State<NewReview> {
         _selectedTags.add(tagId);
       }
     });
+  }
+
+  Future<void> _submitReview() async {
+    if (_titleController.text.isEmpty ||
+        _contentController.text.isEmpty ||
+        _selectedTags.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('모든 필드를 채워주세요.')),
+      );
+      return;
+    }
+
+    final score = 5.0; // StarWidget에서 선택한 별점 값을 가져와야 합니다.
+    final productId = widget.productId; // 전달받은 productId
+
+    if (productId != null) {
+      await _reviewController.submitReview(
+        memberId: 1,
+        title: _titleController.text,
+        detail: _contentController.text,
+        productId: productId,
+        score: score,
+        tagIds: _selectedTags,
+        imageFile: _image,
+      );
+
+      Get.to(Home()); // 리뷰 제출 후 홈으로 돌아가기
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('유효한 제품 ID를 제공해 주세요.')),
+      );
+    }
   }
 
   @override
@@ -114,11 +178,15 @@ class _NewReviewState extends State<NewReview> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          '별점을 등록해주세요.',
+          '별점을 매겨주세요.',
           style: TextStyle(fontSize: 20),
         ),
-        StarListWidget(
-          number: 0,
+        StarWidget(
+          initialRating: 1,
+          onRatingChanged: (rating) {
+            // 별점이 변경되었을 때의 동작을 여기에 구현합니다.
+            print('Selected Rating: $rating');
+          },
         ),
       ],
     );
@@ -236,13 +304,13 @@ class _NewReviewState extends State<NewReview> {
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: tagList.map((tag) {
-              final isSelected = _selectedTags.contains(tag['id']);
+              final isSelected = _selectedTags.contains(tag.id);
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: SelectTagButton(
-                  title: tag['name'],
+                  title: tag.name,
                   isSelected: isSelected,
-                  onTap: () => _onTagSelected(tag['id']),
+                  onTap: () => _onTagSelected(tag.id),
                 ),
               );
             }).toList(),
@@ -257,9 +325,7 @@ class _NewReviewState extends State<NewReview> {
       padding: EdgeInsets.all(16.0),
       color: Colors.white,
       child: ElevatedButton(
-        onPressed: () {
-          Get.to(Home());
-        },
+        onPressed: _submitReview,
         style: ElevatedButton.styleFrom(
           backgroundColor: Color.fromRGBO(238, 150, 175, 0.42),
           minimumSize: Size(double.infinity, 50), // 버튼의 최소 너비

@@ -1,8 +1,9 @@
-
+import 'package:dasamo/src/controllers/review/goods_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:dasamo/src/widgets/comment/separate_text_field.dart';
 import 'package:dasamo/src/widgets/listItems/add_goods_item.dart';
-import 'package:flutter/material.dart';
-import 'new_review.dart'; // NewReview 화면 import
+import 'new_review.dart';
 
 class AddManufacturerInfo extends StatefulWidget {
   const AddManufacturerInfo({super.key});
@@ -16,64 +17,45 @@ class _AddManufacturerInfoState extends State<AddManufacturerInfo> {
   final TextEditingController _productController = TextEditingController();
   bool _isButtonEnabled = false;
   bool _itemNotFound = false;
+  final GoodsController _goodsController = Get.put(GoodsController());
 
-  // 선택된 아이템을 저장할 변수
   int? _selectedItemIndex;
-
-  final List<Map<String, String>> _allGoodsItems = [
-    {'brandSearch': 'Brand A', 'productSearch': 'Product 1'},
-    {'brandSearch': 'Brand B', 'productSearch': 'Product 2'},
-    {'brandSearch': 'Brand C', 'productSearch': 'Product 3'},
-  ];
-
-  List<Map<String, String>> _filteredGoodsItems = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredGoodsItems = _allGoodsItems;
     _manufacturerController.addListener(_updateButtonState);
     _productController.addListener(_updateButtonState);
   }
 
   void _updateButtonState() {
-    final manufacturerText = _manufacturerController.text;
-    final productText = _productController.text;
+    final manufacturerText = _manufacturerController.text.trim();
+    final productText = _productController.text.trim();
 
     setState(() {
-      _isButtonEnabled = manufacturerText.isNotEmpty && productText.isNotEmpty;
+      _isButtonEnabled =
+          (manufacturerText.isNotEmpty && productText.isNotEmpty) ||
+              _selectedItemIndex != null;
       _itemNotFound = !_itemExists(manufacturerText, productText);
-      if (manufacturerText.isEmpty || productText.isEmpty) {
-        _filteredGoodsItems = [];
-      } else {
-        _filteredGoodsItems = _allGoodsItems.where((item) {
-          final brandMatches = item['brandSearch']!
-              .toLowerCase()
-              .contains(manufacturerText.toLowerCase());
-          final productMatches = item['productSearch']!
-              .toLowerCase()
-              .contains(productText.toLowerCase());
-          return brandMatches && productMatches;
-        }).toList();
-      }
     });
   }
 
   bool _itemExists(String manufacturer, String product) {
-    return _allGoodsItems.any(
+    return _goodsController.goodsList.any(
       (item) =>
-          item['brandSearch']!.toLowerCase() == manufacturer.toLowerCase() &&
-          item['productSearch']!.toLowerCase() == product.toLowerCase(),
+          item['brand']!.toLowerCase() == manufacturer.toLowerCase() &&
+          item['name']!.toLowerCase() == product.toLowerCase(),
     );
   }
 
-  void _onItemTap(int index) {
+  void _onItemTap(int index, int originalIndex) {
     setState(() {
-      if (_selectedItemIndex == index) {
-        _selectedItemIndex = null; // 이미 선택된 아이템을 다시 클릭하면 선택 해제
+      if (_selectedItemIndex == originalIndex) {
+        _selectedItemIndex = null;
       } else {
-        _selectedItemIndex = index; // 선택된 아이템 업데이트
+        _selectedItemIndex = originalIndex;
       }
+      _isButtonEnabled = true; // Enable button when an item is selected
     });
   }
 
@@ -96,10 +78,10 @@ class _AddManufacturerInfoState extends State<AddManufacturerInfo> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildInputFields(),
-            if (_manufacturerController.text.isNotEmpty &&
+            if (_manufacturerController.text.isNotEmpty ||
                 _productController.text.isNotEmpty)
-              _buildGoodsList(),
-            _buildFooter(context), // context 전달
+              Obx(() => _buildGoodsList()),
+            _buildFooter(context),
           ],
         ),
       ),
@@ -151,17 +133,29 @@ class _AddManufacturerInfoState extends State<AddManufacturerInfo> {
   }
 
   Widget _buildGoodsList() {
+    final manufacturerText = _manufacturerController.text.trim().toLowerCase();
+    final productText = _productController.text.trim().toLowerCase();
+
+    final filteredGoodsList =
+        _goodsController.goodsList.asMap().entries.where((entry) {
+      final brand = entry.value['brand']?.toLowerCase() ?? '';
+      final name = entry.value['name']?.toLowerCase() ?? '';
+      return brand.contains(manufacturerText) && name.contains(productText);
+    }).toList();
+
     return Expanded(
       child: ListView.builder(
-        itemCount: _filteredGoodsItems.length,
+        itemCount: filteredGoodsList.length,
         itemBuilder: (context, index) {
-          final item = _filteredGoodsItems[index];
-          final isSelected = _selectedItemIndex == index; // 선택된 상태 확인
+          final entry = filteredGoodsList[index];
+          final item = entry.value;
+          final originalIndex = entry.key;
+          final isSelected = _selectedItemIndex == originalIndex;
           return GestureDetector(
-            onTap: () => _onItemTap(index), // 아이템 클릭 시 상태 업데이트
+            onTap: () => _onItemTap(index, originalIndex),
             child: AddGoodsItem(
-              brand: item['brandSearch'] ?? '',
-              product: item['productSearch'] ?? '',
+              brand: item['brand'] ?? '',
+              product: item['name'] ?? '',
               isSelected: isSelected,
             ),
           );
@@ -174,7 +168,7 @@ class _AddManufacturerInfoState extends State<AddManufacturerInfo> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (!_isButtonEnabled)
+        if (!_isButtonEnabled && _selectedItemIndex == null)
           Text(
             '제조사와 제품명을 먼저 입력해주세요.',
             style: TextStyle(
@@ -186,35 +180,46 @@ class _AddManufacturerInfoState extends State<AddManufacturerInfo> {
         ElevatedButton(
           onPressed: _isButtonEnabled
               ? () {
-                  String manufacturer;
-                  String product;
+                  int? productId;
+                  String? brand;
 
                   if (_selectedItemIndex != null) {
-                    manufacturer = _filteredGoodsItems[_selectedItemIndex!]
-                        ['brandSearch']!;
-                    product = _filteredGoodsItems[_selectedItemIndex!]
-                        ['productSearch']!;
+                    final selectedItem =
+                        _goodsController.goodsList[_selectedItemIndex!];
+                    productId = selectedItem['productId'] as int?;
+                    brand = selectedItem['brand'];
+                    print(brand);
+                    print(productId); // Debugging용으로 출력
                   } else {
-                    manufacturer = _manufacturerController.text;
-                    product = _productController.text;
+                    // 제품이 선택되지 않은 경우 처리 (예: 사용자에게 알림 또는 디폴트 값 설정)
+                    // 예를 들어, 다음 코드를 추가할 수 있습니다:
+                    // productId = 0; // 또는 적절한 기본값 설정
+                    // 또는 오류 메시지 출력
                   }
 
-                  // NewReview 화면으로 이동하면서 데이터 전달
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NewReview(
-                        manufacturer: manufacturer,
-                        product: product,
+                  if (productId != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NewReview(
+                          productId: productId,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    // productId가 null인 경우 적절한 처리 (예: 경고 메시지 출력)
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('제품을 선택하거나 검색 결과를 확인해 주세요.'),
+                      ),
+                    );
+                  }
                 }
               : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: _isButtonEnabled
-                ? Color.fromRGBO(175, 99, 120, 1.0) // 활성화 상태 색상
-                : Color.fromRGBO(175, 99, 120, 0.43), // 비활성화 상태 색상
+                ? Color.fromRGBO(175, 99, 120, 1.0)
+                : Color.fromRGBO(175, 99, 120, 0.43),
           ),
           child: const Text('다음'),
         ),

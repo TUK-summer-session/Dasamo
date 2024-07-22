@@ -103,6 +103,13 @@ const searchProducts = async (brandSearch, productSearch) => {
     return products;
 };
 
+const getAllProducts = async () => {
+    const allProducts = await db.query(
+        'SELECT * FROM Product;'
+    );
+    return allProducts;
+}
+
 const deleteReviewById = async (reviewId) => {
     await db.query('DELETE FROM Review WHERE reviewId = ?', [reviewId]);
 };
@@ -152,5 +159,6 @@ module.exports = {
     deleteScrapsByReviewId,
     deleteImageByReviewId,
     deleteQuestionsByReviewId,
-    deleteQuestionById
+    deleteQuestionById,
+    getAllProducts
 };

@@ -1,7 +1,5 @@
-import 'dart:math';
-
-import 'package:dasamo/src/shared/review/goods_data.dart';
-import 'package:dasamo/src/shared/review/review_data.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 
 class GoodsController extends GetxController {
@@ -10,31 +8,28 @@ class GoodsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initialData();
+    fetchGoodsData();
   }
 
-  _initialData() {
-    goodsList.assignAll(goodsItems);
-  }
-
-  void addData() {
-    final random = Random();
-    final newItem = {
-      'id': random.nextInt(100),
-      'brandSearch': '제조사',
-      'productSearch': '제품명',
-      'image': '/',
-      'price': 10000,
-      'calorie': "100kcal",
-    };
-    goodsList.add(newItem);
-  }
-
-  void updateData(Map newData) {
-    final id = newData['id'];
-    final index = goodsList.indexWhere((item) => item['id'] == id);
-    if (index != -1) {
-      goodsList[index] = newData;
+  Future<void> fetchGoodsData() async {
+    final url = 'http://10.0.2.2:3000/api/reviews/products';
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final List<dynamic> data =
+            json.decode(response.body)['data']['products'];
+        goodsList.assignAll(data
+            .map((item) => {
+                  'productId': item['productId'],
+                  'brand': item['brand'],
+                  'name': item['name'],
+                })
+            .toList());
+      } else {
+        print('Failed to load data');
+      }
+    } catch (error) {
+      print('Error fetching data: $error');
     }
   }
 }
