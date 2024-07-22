@@ -1,4 +1,5 @@
 import 'package:dasamo/src/controllers/review/review_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:dasamo/src/home.dart';
 import 'package:dasamo/src/screens/community_page.dart';
 import 'package:dasamo/src/screens/intro.dart';

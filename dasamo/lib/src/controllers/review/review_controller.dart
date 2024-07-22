@@ -22,18 +22,16 @@ class ReviewController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print(data);
         final reviews = (data['data']['reviews'] as List).map((review) {
           return {
             'id': review['reviewId'],
             'title': review['title'],
             'description': review['detail'],
-            'imageFile':
-                review['imageUrl'] ?? 'https://via.placeholder.com/150',
+            'imageUrl': review['imageUrl'] ?? 'https://via.placeholder.com/150',
             'tagKind': review['tags'].split('/'),
             'like': review['likeCount'],
             'comment': review['questionCount'],
-            'writer': 'Unknown',
-            'creationDate': 'Unknown'
           };
         }).toList();
 

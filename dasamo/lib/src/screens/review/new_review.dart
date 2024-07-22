@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -34,6 +35,8 @@ class _NewReviewState extends State<NewReview> {
   List<int> _selectedTags = []; // 선택된 태그 ID 목록
   List<Tag> tagList = []; // 태그 목록
   final ReviewController _reviewController = Get.find<ReviewController>();
+
+  final UserController _userController = Get.put(UserController());
 
   @override
   void initState() {
@@ -114,21 +117,36 @@ class _NewReviewState extends State<NewReview> {
       return;
     }
 
-    final score = 5.0; // StarWidget에서 선택한 별점 값을 가져와야 합니다.
+    final memberIdStr = _userController.userId.value;
+    final memberId = int.tryParse(memberIdStr);
+
+    if (memberId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('유효하지 않은 사용자 ID입니다.')),
+      );
+      return;
+    }
+
     final productId = widget.productId; // 전달받은 productId
 
     if (productId != null) {
-      await _reviewController.submitReview(
-        memberId: 1,
-        title: _titleController.text,
-        detail: _contentController.text,
-        productId: productId,
-        score: score,
-        tagIds: _selectedTags,
-        imageFile: _image,
-      );
-
-      Get.to(Home()); // 리뷰 제출 후 홈으로 돌아가기
+      try {
+        await _reviewController.submitReview(
+          memberId: memberId,
+          title: _titleController.text,
+          detail: _contentController.text,
+          productId: productId,
+          score: 5.0, // 예제에서 하드코딩된 값, 실제로는 적절한 값을 설정해야 합니다.
+          tagIds: _selectedTags,
+          imageFile: _image,
+        );
+        Get.to(Home()); // 리뷰 제출 후 홈으로 돌아가기
+      } catch (e) {
+        print('리뷰 제출 실패: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('리뷰 제출에 실패했습니다.')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('유효한 제품 ID를 제공해 주세요.')),

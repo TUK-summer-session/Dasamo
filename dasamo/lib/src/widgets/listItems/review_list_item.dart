@@ -28,7 +28,7 @@ class ReviewListItem extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10.0),
                       child: Image.network(
-                        item['imageFile'] ?? 'https://via.placeholder.com/150',
+                        item['imageUrl'] ?? 'https://via.placeholder.com/150',
                         width: _imageSize,
                         height: _imageSize,
                         fit: BoxFit.cover,
