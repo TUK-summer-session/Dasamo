@@ -14,6 +14,7 @@ class ReviewsCommentsController extends GetxController {
     fetchComments();
   }
 
+  // 리뷰 댓글 조회
   Future<void> fetchComments() async {
     final url =
         Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$reviewId');
@@ -57,6 +58,7 @@ class ReviewsCommentsController extends GetxController {
     }
   }
 
+  // 리뷰 댓글 저장
   Future<void> postComment(String comment) async {
     final url =
         Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$reviewId');
@@ -79,6 +81,27 @@ class ReviewsCommentsController extends GetxController {
       }
     } catch (e) {
       print('Exception occurred while posting comment: $e');
+    }
+  }
+
+  // 리뷰 댓글 삭제
+  Future<void> deleteComment(int questionId, int memberId) async {
+    final url =
+        Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$questionId');
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({"memberId": memberId});
+
+    try {
+      final response = await http.delete(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('Comment deleted successfully');
+        fetchComments(); // 댓글 목록을 다시 불러옵니다.
+      } else {
+        print('Failed to delete comment: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exception occurred while deleting comment: $e');
     }
   }
 }
