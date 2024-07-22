@@ -1,4 +1,5 @@
 const db = require('../../config/dbConfig');
+const createResponse = require('../../utils/response');
 
 const getReviewById = async (reviewId) => {
     const [rows] = await db.query('SELECT * FROM Review WHERE reviewId = ?', [reviewId]);
