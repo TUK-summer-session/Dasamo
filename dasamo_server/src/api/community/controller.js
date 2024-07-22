@@ -27,10 +27,13 @@ exports.index = async (req, res) => {
       updatedAt: row.updatedAt,
       member: {
         memberId: row.memberId,
-        email: row.email,
         name: row.name,
         profileImageUrl: row.profileImageUrl,
       },
+      image: {
+        imageid: row.communityImageId,
+        url: row.url,
+      }
     }));
 
     const response = createResponse(200, "요청이 성공적으로 처리되었습니다.", {
