@@ -220,9 +220,10 @@ exports.delete = async (req, res) => {
         // 삭제 로직
         await repository.deleteLikesByReviewId(reviewId);
         await repository.deleteScrapsByReviewId(reviewId);
-        await repository.deleteReviewById(reviewId);
+        await repository.deleteQuestionsByReviewId(reviewId);
         await repository.deleteImageByReviewId(reviewId);
         await repository.deleteSelectedTagsByReviewId(reviewId);
+        await repository.deleteReviewById(reviewId);
 
         const response = createResponse(200, '리뷰가 성공적으로 삭제되었습니다.');
         res.send(response);
@@ -236,19 +237,58 @@ exports.delete = async (req, res) => {
 };
 
 exports.update = (req, res) => {
-    res.send(`Update review ${req.params.reviewId}`);
+    console.log(`Update review ${req.params.reviewId}`);
 };
 
-exports.getComments = (req, res) => {
-    res.send(`Get comments for review ${req.params.reviewId}`);
+exports.getQuestions = async (req, res) => {
+    console.log(`Get comments for review ${req.params.reviewId}`);
+    const reviewId = req.params.reviewId;
+
+    try{
+        const questions = await repository.getQuestionAllByReviewId(reviewId);
+        const response = createResponse(200, '리뷰 댓글이 성공적으로 조회되었습니다.', {questions});
+        res.send(response);
+
+    }catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
+
 };
 
-exports.storeComment = (req, res) => {
-    res.send(`Store comment for review ${req.params.reviewId}`);
+exports.storeQuestion = async (req, res) => {
+    console.log(`Store comment for review ${req.params.reviewId}`);
+    let createDTO = req.body;
+    createDTO.reviewId = req.params.reviewId;
+
+    try{
+        await repository.storeQuestions(createDTO);
+        const response = createResponse(200, '리뷰 댓글을 성공적으로 저장했습니다.');
+        res.send(response);
+
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
 };
 
-exports.deleteComment = (req, res) => {
-    res.send(`Delete comment ${req.params.questionId}`);
+exports.deleteQuestion = async (req, res) => {
+    console.log(`Delete comment ${req.params.questionId}`);
+    const { memberId } = req.body;
+    try {
+        const isOwned = await db.query('SELECT * FROM Question WHERE questionId = ? AND memberId = ?', [req.params.questionId, memberId]);
+        console.log(isOwned);
+        if (isOwned.length < 1) {
+            console.log('Question not found or you do not have permission to delete this question.');
+            return res.status(404).send(createResponse(404, '리뷰의 해당 댓글을 찾을 수 없거나 삭제 권한이 없습니다.'));
+        }
+        await repository.deleteQuestionById(req.params.questionId);
+        const response = createResponse(200, '리뷰 댓글을 성공적으로 삭제했습니다.');
+        res.send(response);
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
 };
 
 exports.like = (req, res) => {
