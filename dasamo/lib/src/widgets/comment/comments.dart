@@ -3,14 +3,12 @@ import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/comments_controller.dart';
 
 class Comments extends StatelessWidget {
-  final int reviewId; // reviewId를 전달받기 위한 필드
+  final int reviewId;
 
-  // 생성자에서 reviewId를 받음
-  Comments({required this.reviewId});
+  const Comments({required this.reviewId, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // CommentsController를 생성할 때 reviewId를 전달
     final CommentsController commentsController =
         Get.put(CommentsController(reviewId));
 

@@ -15,7 +15,8 @@ class CommentsController extends GetxController {
   }
 
   Future<void> fetchComments() async {
-    final url = Uri.parse('http://10.0.2.2:3000/api/community$reviewId');
+    final url =
+        Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$reviewId');
 
     try {
       final response = await http.get(url);
@@ -26,22 +27,28 @@ class CommentsController extends GetxController {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        final questions = data['data']['questions'] ?? [];
-        final filteredQuestions = questions.map((question) {
-          return {
-            'questionId': question['questionId'],
-            'memberId': question['memberId'],
-            'name': question['name'],
-            'profileImageUrl': question['profileImageUrl'],
-            "isQuestionForQuestion": question['isQuestionForQuestion'], // false
-            "parentQuestion": question['parentQuestion'],
-            'detail': question['detail'],
-            'createdAt': question['createdAt'],
-            'updatedAt': question['updatedAt'],
-          };
-        }).toList();
+        if (data['data'] != null && data['data']['questions'] != null) {
+          final questions =
+              List<Map<String, dynamic>>.from(data['data']['questions']);
+          print('Questions: $questions');
 
-        commentsList.value = filteredQuestions;
+          final filteredQuestions = questions.map((question) {
+            return {
+              'questionId': question['questionId'],
+              'memberId': question['memberId'],
+              'name': question['name'],
+              'profileImageUrl': question['profileImageUrl'],
+              'detail': question['detail'],
+              'createdAt': question['createdAt'],
+              'updatedAt': question['updatedAt'],
+            };
+          }).toList();
+
+          commentsList.value = filteredQuestions;
+          print('Filtered Questions: $filteredQuestions');
+        } else {
+          print('No questions found in the response.');
+        }
       } else {
         print('Failed to load comments: ${response.statusCode}');
       }
