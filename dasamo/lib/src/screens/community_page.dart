@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:dasamo/src/controllers/comments_controller.dart';
-import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
 
@@ -47,17 +46,7 @@ class _CommunityPageState extends State<CommunityPage> {
         leading: SizedBox.shrink(),
         leadingWidth: 0,
         title: const Text('커뮤니티'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AlarmPage()),
-              );
-            },
-            icon: const Icon(Icons.notifications_none_outlined),
-          ),
-        ],
+
       ),
       body: Obx(() {
         return SingleChildScrollView(

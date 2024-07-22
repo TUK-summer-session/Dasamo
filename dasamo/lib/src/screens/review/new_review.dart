@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dasamo/src/home.dart';
 import 'package:dasamo/src/screens/review/index.dart';
-import 'package:dasamo/src/shared/tag_data.dart';
+import 'package:dasamo/src/shared/review/tag_data.dart';
 import 'package:dasamo/src/widgets/buttons/tags/select_tag_button.dart';
 import 'package:dasamo/src/widgets/list/star_list_widget.dart';
 import 'package:dasamo/src/widgets/modal/more_bottom_modal.dart';

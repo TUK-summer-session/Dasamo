@@ -1,4 +1,4 @@
-import 'package:dasamo/src/controllers/goods_controller.dart';
+import 'package:dasamo/src/controllers/review/goods_controller.dart';
 import 'package:dasamo/src/widgets/buttons/tags/review_tag_button.dart';
 import 'package:dasamo/src/widgets/icons/bookmark_icon.dart';
 import 'package:dasamo/src/widgets/icons/comment_icon.dart';

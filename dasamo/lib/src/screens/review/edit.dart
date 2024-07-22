@@ -1,4 +1,4 @@
-import 'package:dasamo/src/controllers/review_controller.dart';
+import 'package:dasamo/src/controllers/review/review_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dasamo/src/controllers/review_controller.dart';
-import 'package:dasamo/src/screens/alarm_page.dart';
+import 'package:dasamo/src/controllers/review/review_controller.dart';
 import 'package:dasamo/src/screens/review/add_manufacturer_info.dart';
 import 'package:dasamo/src/widgets/buttons/tags/tag_button.dart';
 import 'package:dasamo/src/widgets/listItems/review_list_item.dart';
-import 'package:dasamo/src/shared/tag_data.dart';
+import 'package:dasamo/src/shared/review/tag_data.dart';
 
 class ReviewIndex extends StatefulWidget {
   const ReviewIndex({super.key});
@@ -15,13 +14,14 @@ class ReviewIndex extends StatefulWidget {
 }
 
 class _ReviewIndexState extends State<ReviewIndex> {
-  String? _selectedTag;
+  String? _selectedTag = '전체';
   final ReviewController reviewController = Get.put(ReviewController());
 
   void _onTagSelected(String tag) {
     setState(() {
       _selectedTag = _selectedTag == tag ? null : tag;
     });
+    reviewController.filterReviews(_selectedTag);
   }
 
   @override
@@ -44,17 +44,6 @@ class _ReviewIndexState extends State<ReviewIndex> {
         centerTitle: false,
         leading: Icon(Icons.menu),
         title: const Text('리뷰'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AlarmPage()),
-              );
-            },
-            icon: const Icon(Icons.notifications_none_outlined),
-          ),
-        ],
       ),
       body: Column(
         children: [

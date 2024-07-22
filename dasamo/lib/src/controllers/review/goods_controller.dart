@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:dasamo/src/shared/goods_data.dart';
-import 'package:dasamo/src/shared/review_data.dart';
+import 'package:dasamo/src/shared/review/goods_data.dart';
+import 'package:dasamo/src/shared/review/review_data.dart';
 import 'package:get/get.dart';
 
 class GoodsController extends GetxController {

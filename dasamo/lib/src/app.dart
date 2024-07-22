@@ -3,8 +3,8 @@ import 'package:dasamo/src/screens/community_page.dart';
 import 'package:dasamo/src/screens/intro.dart';
 import 'package:dasamo/src/screens/my_page.dart';
 import 'package:dasamo/src/screens/review/show.dart';
-import 'package:dasamo/src/shared/goods_data.dart';
-import 'package:dasamo/src/shared/review_data.dart';
+import 'package:dasamo/src/shared/review/goods_data.dart';
+import 'package:dasamo/src/shared/review/review_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
