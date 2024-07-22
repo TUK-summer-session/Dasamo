@@ -17,6 +17,9 @@ class CommunityController extends GetxController {
     try {
       final response = await http.get(url).timeout(Duration(seconds: 10));
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final body = response.body;
 

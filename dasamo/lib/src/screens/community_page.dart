@@ -5,10 +5,14 @@ import 'package:dasamo/src/screens/new_community.dart';
 import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
+import 'package:dasamo/src/controllers/comments_controller.dart';
 
 class CommunityPage extends StatelessWidget {
   final CommunityController communityController =
       Get.put(CommunityController());
+
+  final CommentsController commentsController =
+      Get.put(CommentsController()); // CommentsController 등록
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +61,7 @@ class CommunityPage extends StatelessWidget {
             children: communityController.communityData.map((community) {
               final int communityId = community['communityId'];
               final member = community['member'];
+              final image = community['image'];
 
               if (member == null) {
                 return SizedBox.shrink(); // member가 null이면 빈 공간 반환
@@ -115,14 +120,15 @@ class CommunityPage extends StatelessWidget {
                   ),
 
                   // 커뮤니티 이미지 (옵션)
-                  if (community['imageFile'] != null &&
-                      community['imageFile'].isNotEmpty)
+                  if (image != null &&
+                      image['url'] != null &&
+                      image['url'].isNotEmpty)
                     Container(
                       height: 300,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(community['imageFile']),
+                          image: NetworkImage(image['url']),
                           fit: BoxFit.cover,
                         ),
                         boxShadow: [
@@ -164,6 +170,7 @@ class CommunityPage extends StatelessWidget {
                                 // Hover 상태를 처리하는 로직
                               },
                               onTap: () {
+                                commentsController.fetchComments();
                                 showModalBottomSheet(
                                   context: context,
                                   isScrollControlled: true,
