@@ -18,7 +18,7 @@ class ReviewController extends GetxController {
   Future<void> fetchReviews() async {
     try {
       final response =
-          await http.get(Uri.parse('http://10.0.2.2:3000/api/reviews'));
+          await http.get(Uri.parse('http://localhost:3000/api/reviews'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -48,7 +48,7 @@ class ReviewController extends GetxController {
   Future<void> fetchReviewData(int reviewId) async {
     try {
       final response = await http
-          .get(Uri.parse('http://10.0.2.2:3000/api/reviews/$reviewId'));
+          .get(Uri.parse('http://localhost:3000/api/reviews/$reviewId'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
@@ -70,7 +70,8 @@ class ReviewController extends GetxController {
     required List<int> tagIds,
     File? imageFile,
   }) async {
-    final uri = Uri.parse('http://10.0.2.2:3000/api/reviews'); // API URL을 변경하세요
+    final uri =
+        Uri.parse('http://localhost:3000/api/reviews'); // API URL을 변경하세요
 
     final request = http.MultipartRequest('POST', uri)
       ..fields['memberId'] = memberId.toString()
@@ -99,6 +100,30 @@ class ReviewController extends GetxController {
       }
     } catch (e) {
       print('Error: $e');
+    }
+  }
+
+  Future<void> deleteReview(int reviewId, String memberId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:3000/api/reviews/$reviewId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'memberId': memberId}),
+      );
+
+      if (response.statusCode == 200) {
+        print("Review deleted successfully");
+        fetchReviews(); // 리뷰 목록을 갱신합니다.
+        Get.snackbar('성공', '리뷰가 성공적으로 삭제되었습니다.');
+      } else {
+        print("Failed to delete review: ${response.body}");
+        Get.snackbar('오류', '리뷰 삭제에 실패했습니다.');
+      }
+    } catch (e) {
+      print('Error: $e');
+      Get.snackbar('오류', '서버와 연결할 수 없습니다.');
     }
   }
 

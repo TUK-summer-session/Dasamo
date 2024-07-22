@@ -194,105 +194,110 @@ exports.deleteImage = (req, res) => {
 };
 
 exports.getDetail = async (req, res) => {
-  console.log(`Detail review ${req.params.reviewId}`);
-  const { memberId } = req.body;
-  console.log(`memberId ${memberId}`);
-  const reviewId = req.params.reviewId;
-
-  try {
-    // 1. review 객체 찾기
-    let [reviewDetail] = await db.query(
-      `SELECT * FROM Review WHERE reviewId = ?`,
-      [reviewId]
-    );
-    console.log(reviewDetail); // 체크
-
-    if (!reviewDetail) {
-      console.log("No rows returned from query");
-      return res
-        .status(404)
-        .send(createResponse(404, "리뷰를 찾을 수 없습니다."));
+    console.log(`Detail review ${req.params.reviewId}`);
+    const { memberId } = req.body;
+    console.log(`memberId ${memberId}`);
+    const reviewId = req.params.reviewId;
+  
+    try {
+      // 1. review 객체 찾기
+      let [reviewDetail] = await db.query(
+        `SELECT * FROM Review WHERE reviewId = ?`,
+        [reviewId]
+      );
+      console.log(reviewDetail); // 체크
+  
+      if (!reviewDetail) {
+        console.log("No rows returned from query");
+        return res
+          .status(404)
+          .send(createResponse(404, "리뷰를 찾을 수 없습니다."));
+      }
+  
+      // 2. reviewImage
+      const reviewImageUrl =
+        (await repository.getReviewImageByReviewId(reviewId)) || null;
+      console.log(reviewImageUrl);
+  
+      // 3. search product
+      const [product] = await db.query(
+        `SELECT * FROM Product WHERE productId = ?`,
+        [reviewDetail.productId || null]
+      );
+  
+      console.log(product);
+      if (!product || product.length === 0) {
+        console.log("No product found with the given productId");
+        return res
+          .status(404)
+          .send(createResponse(404, "해당 제품을 찾을 수 없습니다."));
+      }
+  
+      const [writer] = await db.query(
+        `SELECT memberId, profileImageUrl, name FROM Member WHERE memberId = ?`,
+        [reviewDetail.memberId || null]
+      );
+  
+      const tagRows = await db.query(
+        "SELECT name FROM Tag JOIN SelectedTag ON Tag.tagId = SelectedTag.tagId WHERE SelectedTag.reviewId = ?",
+        [reviewId]
+      );
+      const tags = tagRows
+        .map((tag, index) => tag.name + (index < tagRows.length - 1 ? "/" : ""))
+        .join(""); // 마지막 태그는 / 삭제
+      console.log(tags);
+  
+      const like = await db.query(
+        "SELECT state FROM `Like` WHERE memberId = ? AND feedId = ? AND likeType = ?",
+        [memberId || null, reviewId || null, 0]
+      );
+  
+      const scrap = await db.query(
+        `SELECT state FROM Scrap WHERE memberId = ? AND feedId = ?`,
+        [memberId || null, reviewId || null]
+      );
+  
+      const likeCountResult = await db.query(
+        "SELECT COUNT(*) AS count FROM `Like` WHERE feedId = ? AND state = 1 AND likeType = 0",
+        [reviewId || null]
+      );
+      const likeCount = likeCountResult[0].count;
+      const questionCountResult = await db.query(
+        "SELECT COUNT(*) AS count FROM Scrap WHERE feedId = ? AND state = 1",
+        [reviewId || null]
+      );
+      const questionCount = questionCountResult[0].count;
+  
+      // Check if the current user is the author of the review
+      const isAuthor = reviewDetail.memberId === memberId;
+  
+      const response = createResponse(200, "요청이 성공적으로 처리되었습니다.", {
+        reviewDetail: {
+          reviewId: reviewDetail.reviewId,
+          title: reviewDetail.title,
+          detail: reviewDetail.detail,
+          imageUrl: reviewImageUrl,
+          score: reviewDetail.score,
+          isLiked: like.length > 0 && like[0].state === 1,
+          isScraped: scrap.length > 0 && scrap[0].state === 1,
+          likeCount: likeCount,
+          questionCount: questionCount,
+          tags: tags,
+          createdAt: reviewDetail.createdAt,
+          updatedAt: reviewDetail.updatedAt,
+        },
+        product,
+        writer,
+        isAuthor, // Add isAuthor to the response
+      });
+  
+      res.send(response);
+    } catch (error) {
+      console.error("Query error:", error);
+      res.status(500).send(createResponse(500, "서버 오류"));
     }
-
-    // 2. reviewImage
-    const reviewImageUrl =
-      (await repository.getReviewImageByReviewId(reviewId)) || null;
-    console.log(reviewImageUrl);
-
-    // 3. search product
-    const [product] = await db.query(
-      `SELECT * FROM Product WHERE productId = ?`,
-      [reviewDetail.productId || null]
-    );
-
-    console.log(product);
-    if (!product || product.length === 0) {
-      console.log("No product found with the given productId");
-      return res
-        .status(404)
-        .send(createResponse(404, "해당 제품을 찾을 수 없습니다."));
-    }
-
-    const [writer] = await db.query(
-      `SELECT memberId, profileImageUrl, name FROM Member WHERE memberId = ?`,
-      [reviewDetail.memberId || null]
-    );
-
-    const tagRows = await db.query(
-      "SELECT name FROM Tag JOIN SelectedTag ON Tag.tagId = SelectedTag.tagId WHERE SelectedTag.reviewId = ?",
-      [reviewId]
-    );
-    const tags = tagRows
-      .map((tag, index) => tag.name + (index < tagRows.length - 1 ? "/" : ""))
-      .join(""); // 마지막 태그는 / 삭제
-    console.log(tags);
-
-    const like = await db.query(
-      "SELECT state FROM `Like` WHERE memberId = ? AND feedId = ? AND likeType = ?",
-      [memberId || null, reviewId || null, 0]
-    );
-
-    const scrap = await db.query(
-      `SELECT state FROM Scrap WHERE memberId = ? AND feedId = ?`,
-      [memberId || null, reviewId || null]
-    );
-
-    const likeCountResult = await db.query(
-      "SELECT COUNT(*) AS count FROM `Like` WHERE feedId = ? AND state = 1 AND likeType = 0",
-      [reviewId || null]
-    );
-    const likeCount = likeCountResult[0].count;
-    const questionCountResult = await db.query(
-      "SELECT COUNT(*) AS count FROM Scrap WHERE feedId = ? AND state = 1",
-      [reviewId || null]
-    );
-    const questionCount = questionCountResult[0].count;
-
-    const response = createResponse(200, "요청이 성공적으로 처리되었습니다.", {
-      reviewDetail: {
-        reviewId: reviewDetail.reviewId,
-        title: reviewDetail.title,
-        detail: reviewDetail.detail,
-        imageUrl: reviewImageUrl,
-        score: reviewDetail.score,
-        isLiked: like.length > 0 && like[0].state === 1,
-        isScraped: scrap.length > 0 && scrap[0].state === 1,
-        likeCount: likeCount,
-        questionCount: questionCount,
-        tags: tags,
-        createdAt: reviewDetail.createdAt,
-        updatedAt: reviewDetail.updatedAt,
-      },
-      product,
-      writer,
-    });
-
-    res.send(response);
-  } catch (error) {
-    console.error("Query error:", error);
-    res.status(500).send(createResponse(500, "서버 오류"));
-  }
-};
+  };
+  
 
 exports.delete = async (req, res) => {
   console.log(`Delete review ${req.params.reviewId}`);
