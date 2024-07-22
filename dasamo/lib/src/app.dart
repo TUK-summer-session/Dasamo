@@ -1,5 +1,5 @@
 import 'package:dasamo/src/home.dart';
-import 'package:dasamo/src/screens/community_page.dart';
+import 'package:dasamo/src/screens/community/community_page.dart';
 import 'package:dasamo/src/screens/intro.dart';
 import 'package:dasamo/src/screens/my_page.dart';
 import 'package:dasamo/src/screens/review/show.dart';

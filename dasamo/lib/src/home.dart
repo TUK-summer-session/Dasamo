@@ -1,6 +1,6 @@
 import 'package:dasamo/src/screens/review/index.dart';
 import 'package:flutter/material.dart';
-import 'package:dasamo/src/screens/community_page.dart';
+import 'package:dasamo/src/screens/community/community_page.dart';
 import 'package:dasamo/src/screens/my_page.dart';
 
 class Home extends StatefulWidget {
