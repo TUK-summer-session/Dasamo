@@ -65,18 +65,18 @@ const storeComment = async (commentData) => {
   return result;
 };
 
-const checkIfAlreadyLiked = async (memberId, communityId) => {
-  const result = await db.query("SELECT * FROM Likes WHERE member_id = $1 AND feed_id = $2 AND like_type = 1 AND state = 1", [memberId, communityId]);
-  return result.rows.length > 0;
+const checkIfAlreadyLiked = async (memberId, feedId) => {
+  const result = await db.query("SELECT * FROM `Like` WHERE memberId = ? AND feedId = ? AND `likeType` = 1", [memberId, feedId]);
+  return result.length > 0;
 };
 
-const likeCommunityPost = async (memberId, communityId) => {
-  const result = await db.query("INSERT INTO Likes (member_id, feed_id, like_type, state, created_at) VALUES ($1, $2, 1, 1, NOW())", [memberId, communityId]);
+const likeCommunityPost = async (memberId, feedId) => {
+  const result = await db.query("INSERT INTO `Like` (memberId, feedId, likeType, state, createdAt) VALUES (?, ?, 1, 1, NOW())", [memberId, feedId]);
   return result;
 };
 
-const unlikeCommunityPost = async (memberId, communityId) => {
-  const result = await db.query("DELETE FROM Likes WHERE member_id = $1 AND feed_id = $2 AND like_type = 1 AND state = 1", [memberId, communityId]);
+const unlikeCommunityPost = async (memberId, feedId) => {
+  const result = await db.query("DELETE FROM `Like` WHERE memberId = ? AND feedId = ? AND likeType = 1 AND state = 1", [memberId, feedId]);
   return result;
 };
 

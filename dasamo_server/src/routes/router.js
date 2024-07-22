@@ -39,7 +39,7 @@ router.put('/api/reviews/:reviewId', apiReviewController.update);
 router.get('/api/reviews/questions/:reviewId', apiReviewController.getQuestions);
 router.post('/api/reviews/questions/:reviewId', apiReviewController.storeQuestion);
 router.delete('/api/reviews/questions/:questionId', apiReviewController.deleteQuestion);
-router.post('/api/reviews/like/:reviewId', apiReviewController.like);
+router.post('/api/reviews/like/:reviewId', apiReviewController.storeLike);
 router.post('/api/reviews/scrap/:reviewId', apiReviewController.scrap);
 router.delete('/api/reviews/like/:reviewId', apiReviewController.unlike);
 router.delete('/api/reviews/scrap/:reviewId', apiReviewController.unscrap);
@@ -51,7 +51,7 @@ router.put('/api/community/:communityId', apiCommunityController.update);
 router.delete('/api/community/image', apiCommunityController.deleteCommunity);
 router.get('/api/community/comments/:communityId', apiCommunityController.getComments);
 router.post('/api/community/comments/:communityId', apiCommunityController.storeComment);
-router.post('/api/community/like/:communityId', apiCommunityController.like);
+router.post('/api/community/like/:communityId', apiCommunityController.storeLike);
 router.delete('/api/community/like/:communityId', apiCommunityController.unlike);
 
 module.exports = router;
