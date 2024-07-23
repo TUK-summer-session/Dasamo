@@ -1,3 +1,4 @@
+import 'package:dasamo/src/widgets/icons/community_comment_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
@@ -182,6 +183,7 @@ class _CommunityPageState extends State<CommunityPage> {
                               ),
                             ),
                             SizedBox(width: 5),
+                            CommunityCommentIcon(),
                           ],
                         ),
                       ],
