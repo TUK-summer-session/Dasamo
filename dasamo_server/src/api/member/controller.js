@@ -12,8 +12,7 @@ exports.signup = (req, res) => {
 
 exports.mypage = async (req, res) => {
     console.log('User mypage');
-    const memberId = req.body.memberId;
-
+    const memberId = parseInt(req.query.memberId, 10);
     try {
         // 1. 내정보 땡겨오기
         if (!memberId) {

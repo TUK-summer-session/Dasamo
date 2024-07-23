@@ -9,7 +9,7 @@ const repository = require('./repository');
 // 커뮤니티 목록 조회
 exports.index = async (req, res) => {
   console.log("Community home");
-  const memberId = req.body.memberId;
+  const memberId = parseInt(req.query.memberId, 10);
   try {
     const result = await repository.getCommunitiesWithMembers(memberId);
 

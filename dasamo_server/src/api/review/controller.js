@@ -114,7 +114,7 @@ exports.deleteImage = (req, res) => {
 
 exports.getDetail = async (req, res) => {
     console.log(`Detail review ${req.params.reviewId}`);
-    const { memberId } = req.body;
+    const memberId = parseInt(req.query.memberId, 10);
     console.log(`memberId ${memberId}`);
     const reviewId = req.params.reviewId;
 
