@@ -7,32 +7,34 @@ class HeartIcon extends StatefulWidget {
   const HeartIcon({
     required this.isFavorited,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _HeartIconState createState() => _HeartIconState();
 }
 
 class _HeartIconState extends State<HeartIcon> {
-  bool _hovered = false;
+  bool _isFavorited = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorited = widget.isFavorited;
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onHover: (hovered) {
+      onTap: () async {
+        await widget.onTap(_isFavorited);
         setState(() {
-          _hovered = hovered;
+          _isFavorited = !_isFavorited;
         });
       },
-      onTap: () {
-        widget.onTap(!_hovered);
-      },
       child: Icon(
-        widget.isFavorited
-            ? Icons.favorite
-            : (_hovered ? Icons.favorite : Icons.favorite_border),
-        color: widget.isFavorited ? Colors.red : (_hovered ? Colors.red : null),
+        _isFavorited ? Icons.favorite : Icons.favorite_border,
+        color: _isFavorited ? Colors.red : null,
       ),
     );
   }

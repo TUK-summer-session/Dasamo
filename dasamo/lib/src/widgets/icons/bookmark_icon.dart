@@ -7,32 +7,34 @@ class BookmarkIcon extends StatefulWidget {
   const BookmarkIcon({
     required this.isBookmarked,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _BookmarkIconState createState() => _BookmarkIconState();
 }
 
 class _BookmarkIconState extends State<BookmarkIcon> {
-  bool _hovered = false;
+  bool _isBookmarked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isBookmarked = widget.isBookmarked;
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onHover: (hovered) {
+      onTap: () async {
+        await widget.onTap(_isBookmarked);
         setState(() {
-          _hovered = hovered;
+          _isBookmarked = !_isBookmarked;
         });
       },
-      onTap: () {
-        widget.onTap(!_hovered);
-      },
       child: Icon(
-        widget.isBookmarked
-            ? Icons.bookmark
-            : (_hovered ? Icons.bookmark : Icons.bookmark_border),
-        color: widget.isBookmarked ? Color.fromRGBO(255, 193, 100, 1.0) : (_hovered ? Color.fromRGBO(255, 193, 100, 1.0) : null),
+        _isBookmarked ? Icons.bookmark : Icons.bookmark_border_outlined,
+        color: _isBookmarked ? Color.fromARGB(255, 219, 205, 72) : null,
       ),
     );
   }

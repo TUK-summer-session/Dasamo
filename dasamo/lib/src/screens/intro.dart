@@ -1,7 +1,8 @@
-import 'package:dasamo/src/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
+import '../home.dart';
 
 class Intro extends StatefulWidget {
   const Intro({super.key});
@@ -11,6 +12,8 @@ class Intro extends StatefulWidget {
 }
 
 class _IntroState extends State<Intro> {
+  final UserController _userController = Get.put(UserController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +47,8 @@ class _IntroState extends State<Intro> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 30),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                await _userController.signWithKakao();
                 Get.to(() => const Home());
               },
               child: const Text('카카오로 시작하기'),

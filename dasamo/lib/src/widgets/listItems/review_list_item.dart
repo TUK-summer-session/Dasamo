@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dasamo/src/widgets/buttons/tags/review_tag_button.dart';
 import 'package:get/get.dart';
 
-const double _imageSize = 90;
+const double _imageSize = 80;
 
 class ReviewListItem extends StatelessWidget {
   final Map item;
@@ -15,7 +15,7 @@ class ReviewListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Get.to(() => ReviewShow(reviewItem: item));
+        Get.toNamed('/review/${item['id']}'); // reviewId로 라우팅
       },
       child: Stack(
         children: [
@@ -44,7 +44,8 @@ class ReviewListItem extends StatelessWidget {
                             Text(
                               item['title'],
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 24),
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                             // 리뷰할 물건의 설명
                             Text(

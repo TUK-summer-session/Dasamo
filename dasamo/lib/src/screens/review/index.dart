@@ -1,11 +1,11 @@
+import 'package:dasamo/src/screens/review/show.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dasamo/src/controllers/review_controller.dart';
-import 'package:dasamo/src/screens/alarm_page.dart';
+import 'package:dasamo/src/controllers/review/review_controller.dart';
 import 'package:dasamo/src/screens/review/add_manufacturer_info.dart';
 import 'package:dasamo/src/widgets/buttons/tags/tag_button.dart';
 import 'package:dasamo/src/widgets/listItems/review_list_item.dart';
-import 'package:dasamo/src/shared/tag_data.dart';
+import 'package:dasamo/src/shared/review/tag_data.dart';
 
 class ReviewIndex extends StatefulWidget {
   const ReviewIndex({super.key});
@@ -15,13 +15,26 @@ class ReviewIndex extends StatefulWidget {
 }
 
 class _ReviewIndexState extends State<ReviewIndex> {
-  String? _selectedTag;
+  String? _selectedTag = '전체';
   final ReviewController reviewController = Get.put(ReviewController());
 
   void _onTagSelected(String tag) {
     setState(() {
       _selectedTag = _selectedTag == tag ? null : tag;
     });
+    reviewController.filterReviews(_selectedTag);
+  }
+
+  Future<void> _navigateToReviewShow(int reviewId) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ReviewShow(reviewId: reviewId)),
+    );
+
+    if (result == true) {
+      // 새로고침 필요
+      reviewController.fetchReviews(); // 리뷰 목록 새로 고침
+    }
   }
 
   @override
@@ -31,8 +44,7 @@ class _ReviewIndexState extends State<ReviewIndex> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const AddManufacturerInfo()),
+            MaterialPageRoute(builder: (context) => const AddManufacturerInfo()),
           );
         },
         child: Icon(
@@ -42,19 +54,9 @@ class _ReviewIndexState extends State<ReviewIndex> {
       ),
       appBar: AppBar(
         centerTitle: false,
-        leading: Icon(Icons.menu),
         title: const Text('리뷰'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AlarmPage()),
-              );
-            },
-            icon: const Icon(Icons.notifications_none_outlined),
-          ),
-        ],
+        leading: SizedBox.shrink(),
+        leadingWidth: 0,
       ),
       body: Column(
         children: [

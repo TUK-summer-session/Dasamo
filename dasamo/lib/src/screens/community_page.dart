@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
-import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
 import 'package:dasamo/src/screens/new_community.dart';
-import 'package:dasamo/src/screens/alarm_page.dart';
-import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
 
-class CommunityPage extends StatelessWidget {
+class CommunityPage extends StatefulWidget {
+  @override
+  _CommunityPageState createState() => _CommunityPageState();
+}
+
+class _CommunityPageState extends State<CommunityPage> {
   final CommunityController communityController =
       Get.put(CommunityController());
+  bool _favoriteHovered = false;
+  bool _favoriteTapped = false;
 
-  CommunityPage({Key? key}) : super(key: key);
+  @override
+  void initState() {
+    super.initState();
+    // 데이터 초기 로드 (memberId를 적절히 설정)
+    final int memberId = 1; // 실제 memberId를 이곳에 설정합니다.
+    communityController.fetchCommunities(memberId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // 데이터 초기 로드
-    communityController.fetchCommunities();
-
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'addTag2',
@@ -38,17 +45,7 @@ class CommunityPage extends StatelessWidget {
         leading: SizedBox.shrink(),
         leadingWidth: 0,
         title: const Text('커뮤니티'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AlarmPage()),
-              );
-            },
-            icon: const Icon(Icons.notifications_none_outlined),
-          ),
-        ],
+
       ),
       body: Obx(() {
         if (communityController.communityList.isEmpty) {
@@ -154,36 +151,26 @@ class CommunityPage extends StatelessWidget {
                         Row(
                           children: <Widget>[
                             InkWell(
+                              onHover: (hovered) {
+                                setState(() {
+                                  _favoriteHovered = hovered;
+                                });
+                              },
                               onTap: () {
-                                print(
-                                    'Heart icon tapped for communityId: $communityId');
+                                setState(() {
+                                  // Toggle the like status
+                                  community['isLiked'] = !community['isLiked'];
+                                });
+                                print('하트 아이콘을 탭했습니다.');
                               },
                               child: Icon(
-                                Icons.favorite_border,
-                                color: Colors.grey,
+                                community['isLiked']
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: community['isLiked'] ? Colors.red : null,
                               ),
                             ),
                             SizedBox(width: 5),
-                            // InkWell(
-                            //   onTap: () {
-                            //     final commentsController = ReviewsCommentsController(communityId);
-                            //     commentsController.fetchComments();
-
-                            //     showModalBottomSheet(
-                            //       context: context,
-                            //       isScrollControlled: true,
-                            //       builder: (context) => CommentModal(
-                            //         commentsController: commentsController,
-                            //         reviewId: communityId,
-                            //       ),
-                            //     );
-                            //     print('Comment icon tapped for communityId: $communityId');
-                            //   },
-                            //   child: Icon(
-                            //     Icons.chat_bubble_outline,
-                            //     color: Colors.grey,
-                            //   ),
-                            // ),
                           ],
                         ),
                       ],

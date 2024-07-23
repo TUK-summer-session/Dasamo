@@ -1,4 +1,5 @@
 const db = require('../../config/dbConfig');
+const createResponse = require('../../utils/response');
 
 const getReviewById = async (reviewId) => {
     const [rows] = await db.query('SELECT * FROM Review WHERE reviewId = ?', [reviewId]);
@@ -103,6 +104,13 @@ const searchProducts = async (brandSearch, productSearch) => {
     return products;
 };
 
+const getAllProducts = async () => {
+    const allProducts = await db.query(
+        'SELECT * FROM Product;'
+    );
+    return allProducts;
+}
+
 const deleteReviewById = async (reviewId) => {
     await db.query('DELETE FROM Review WHERE reviewId = ?', [reviewId]);
 };
@@ -188,5 +196,7 @@ module.exports = {
     unlikeReviewPost,
     checkIfAlreadyScraped,
     scrapReviewPost,
-    unscrapReviewPost
+    unscrapReviewPost,
+    getAllProducts,
+    deleteQuestionById,
 };
