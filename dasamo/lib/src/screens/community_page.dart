@@ -139,8 +139,7 @@ class _CommunityPageState extends State<CommunityPage> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(
-                              'http://10.0.2.2:3000/${image['url']}'),
+                          image: NetworkImage(image['url'] ?? ''),
                           fit: BoxFit.cover,
                         ),
                         boxShadow: [
