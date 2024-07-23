@@ -30,28 +30,28 @@ class CommunityCommentsController extends GetxController {
         final data = json.decode(response.body);
 
         if (data['data'] != null && data['data']['comments'] != null) {
-          final questions =
+          final community =
               List<Map<String, dynamic>>.from(data['data']['comments']);
-          print('Questions: $questions');
+          print('community: $community');
 
-          final filteredQuestions = questions.map((question) {
+          final filteredCommunity = community.map((community) {
             return {
-              'communityId': question['questionId'],
-              'memberId': question['memberId'],
-              'name': question['name'],
-              'profileImageUrl': question['profileImageUrl'],
+              'commentId': community['commentId'],
+              'memberId': community['memberId'],
+              'name': community['name'],
+              'profileImageUrl': community['profileImageUrl'],
               "isCommentForComment": false,
               "parentComment": null,
-              'detail': question['detail'],
-              'createdAt': question['createdAt'],
-              'updatedAt': question['updatedAt'],
+              'detail': community['detail'],
+              'createdAt': community['createdAt'],
+              'updatedAt': community['updatedAt'],
             };
           }).toList();
 
-          communityCommentsList.value = filteredQuestions;
-          print('Filtered Questions: $filteredQuestions');
+          communityCommentsList.value = filteredCommunity;
+          print('Filtered community: $filteredCommunity');
         } else {
-          print('No questions found in the response.');
+          print('No community found in the response.');
         }
       } else {
         print('Failed to load comments: ${response.statusCode}');
@@ -89,11 +89,13 @@ class CommunityCommentsController extends GetxController {
 
 /////////////////
   // 리뷰 댓글 삭제
-  Future<void> deleteComment(int questionId, int memberId) async {
+  Future<void> deleteComment(int commentId, int memberId) async {
     final url =
-        Uri.parse('http://10.0.2.2:3000/api/community/comments/$communityId');
+        Uri.parse('http://10.0.2.2:3000/api/community/comments/$commentId');
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode({"memberId": memberId});
+    print('Comment ID: $commentId');
+    print('Member ID: $memberId');
 
     try {
       final response = await http.delete(url, headers: headers, body: body);

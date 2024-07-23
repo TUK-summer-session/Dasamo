@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:dasamo/src/screens/new_community.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
+import 'package:dasamo/src/widgets/icons/community_comment_icon.dart';
 
 class CommunityPage extends StatefulWidget {
   @override
@@ -13,7 +14,6 @@ class _CommunityPageState extends State<CommunityPage> {
   final CommunityController communityController =
       Get.put(CommunityController());
   bool _favoriteHovered = false;
-  bool _favoriteTapped = false;
 
   @override
   void initState() {
@@ -21,6 +21,31 @@ class _CommunityPageState extends State<CommunityPage> {
     // 데이터 초기 로드 (memberId를 적절히 설정)
     final int memberId = 1; // 실제 memberId를 이곳에 설정합니다.
     communityController.fetchCommunities(memberId);
+  }
+
+  Future<void> _toggleLike(Map<String, dynamic> community) async {
+    final int communityId = community['communityId'];
+    final int memberId = 1; // 실제 memberId를 이곳에 설정합니다.
+
+    try {
+      if (community['isLiked']) {
+        await communityController.unlikeCommunityComment(
+          communityId: communityId,
+          memberId: memberId,
+        );
+      } else {
+        await communityController.likeCommunityComment(
+          communityId: communityId,
+          memberId: memberId,
+        );
+      }
+
+      setState(() {
+        community['isLiked'] = !community['isLiked'];
+      });
+    } catch (e) {
+      print('Error toggling like status: $e');
+    }
   }
 
   @override
@@ -127,8 +152,7 @@ class _CommunityPageState extends State<CommunityPage> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(
-                              'http://10.0.2.2:3000/${image['url']}'),
+                          image: NetworkImage(image['url'] ?? ''),
                           fit: BoxFit.cover,
                         ),
                         boxShadow: [
@@ -156,21 +180,21 @@ class _CommunityPageState extends State<CommunityPage> {
                                   _favoriteHovered = hovered;
                                 });
                               },
-                              onTap: () {
-                                setState(() {
-                                  // Toggle the like status
-                                  community['isLiked'] = !community['isLiked'];
-                                });
+                              onTap: () async {
+                                await _toggleLike(community);
                                 print('하트 아이콘을 탭했습니다.');
                               },
                               child: Icon(
                                 community['isLiked']
                                     ? Icons.favorite
                                     : Icons.favorite_border,
-                                color: community['isLiked'] ? Colors.red : null,
+                                color: community['isLiked'] || _favoriteHovered
+                                    ? Colors.red
+                                    : null,
                               ),
                             ),
                             SizedBox(width: 5),
+                            CommunityCommentIcon(),
                           ],
                         ),
                       ],
