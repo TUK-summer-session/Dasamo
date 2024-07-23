@@ -1,3 +1,4 @@
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
@@ -12,6 +13,8 @@ class ReviewsComments extends StatelessWidget {
     final ReviewsCommentsController commentsController =
         Get.put(ReviewsCommentsController(reviewId));
 
+    final UserController userController = Get.put(UserController());
+
     return Obx(() {
       if (commentsController.commentsList.isEmpty) {
         return Center(
@@ -24,6 +27,8 @@ class ReviewsComments extends StatelessWidget {
         itemBuilder: (context, index) {
           final comment = commentsController.commentsList[index];
 
+          final int memberId = int.parse(userController.userId.value);
+
           return ListTile(
             title: Text(comment['name']),
             subtitle: Text(comment['detail']),
@@ -31,7 +36,7 @@ class ReviewsComments extends StatelessWidget {
               backgroundImage: NetworkImage(comment['profileImageUrl']),
             ),
             // member id가 1이면
-            trailing: comment['memberId'] == 1
+            trailing: comment['memberId'] == memberId
                 ? IconButton(
                     icon: Icon(Icons.close, color: Colors.red),
                     onPressed: () async {

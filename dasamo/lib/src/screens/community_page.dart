@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:dasamo/src/screens/new_community.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
 import 'package:dasamo/src/widgets/icons/community_comment_icon.dart';
@@ -13,19 +14,23 @@ class CommunityPage extends StatefulWidget {
 class _CommunityPageState extends State<CommunityPage> {
   final CommunityController communityController =
       Get.put(CommunityController());
+  final UserController userController = Get.put(UserController());
   bool _favoriteHovered = false;
 
   @override
   void initState() {
     super.initState();
-    // 데이터 초기 로드 (memberId를 적절히 설정)
-    final int memberId = 1; // 실제 memberId를 이곳에 설정합니다.
+    // 데이터 초기 로드
+    final memberId =
+        int.parse(userController.userId.value); // 실제 memberId를 이곳에 설정합니다.
     communityController.fetchCommunities(memberId);
   }
 
   Future<void> _toggleLike(Map<String, dynamic> community) async {
     final int communityId = community['communityId'];
-    final int memberId = 1; // 실제 memberId를 이곳에 설정합니다.
+    final int memberId =
+        int.parse(userController.userId.value); // memberId를 적절히 설정합니다.
+    print("member:$memberId");
 
     try {
       if (community['isLiked']) {
@@ -70,7 +75,6 @@ class _CommunityPageState extends State<CommunityPage> {
         leading: SizedBox.shrink(),
         leadingWidth: 0,
         title: const Text('커뮤니티'),
-
       ),
       body: Obx(() {
         if (communityController.communityList.isEmpty) {
@@ -194,7 +198,7 @@ class _CommunityPageState extends State<CommunityPage> {
                               ),
                             ),
                             SizedBox(width: 5),
-                            CommunityCommentIcon(),
+                            CommunityCommentIcon(communityId: communityId),
                           ],
                         ),
                       ],

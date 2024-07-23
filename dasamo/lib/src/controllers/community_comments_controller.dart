@@ -62,12 +62,12 @@ class CommunityCommentsController extends GetxController {
   }
 
   // 리뷰 댓글 저장
-  Future<void> postComment(String comment) async {
+  Future<void> postComment(int memberId, String comment) async {
     final url =
         Uri.parse('http://10.0.2.2:3000/api/community/comments/$communityId');
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode({
-      "memberId": 1,
+      "memberId": memberId,
       "isCommentForComment": 0, // false
       "parentComment": null,
       "detail": comment

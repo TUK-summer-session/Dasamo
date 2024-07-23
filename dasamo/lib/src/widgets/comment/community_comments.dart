@@ -1,4 +1,5 @@
 import 'package:dasamo/src/controllers/community_comments_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,6 +13,10 @@ class CommunityComments extends StatelessWidget {
   Widget build(BuildContext context) {
     final CommunityCommentsController communityCommentsController =
         Get.put(CommunityCommentsController(communityId));
+    //  final UserController userController = Get.put(UserController());
+
+    //  final int memberId =
+    // int.parse(userController.userId.value);
 
     return Obx(() {
       if (communityCommentsController.communityCommentsList.isEmpty) {
@@ -36,7 +41,7 @@ class CommunityComments extends StatelessWidget {
               backgroundImage: NetworkImage(comment['profileImageUrl']),
             ),
             // member id가 1이면
-            trailing: comment['memberId'] == 1
+            trailing: comment['memberId'] == memberId
                 ? IconButton(
                     icon: Icon(Icons.close, color: Colors.red),
                     onPressed: () async {

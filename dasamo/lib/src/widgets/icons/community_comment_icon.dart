@@ -3,7 +3,9 @@ import 'package:dasamo/src/widgets/comment/community_comments.dart';
 import 'package:flutter/material.dart';
 
 class CommunityCommentIcon extends StatefulWidget {
-  const CommunityCommentIcon({Key? key}) : super(key: key);
+  final int communityId;
+
+  CommunityCommentIcon({required this.communityId});
 
   @override
   _CommunityCommentIconState createState() => _CommunityCommentIconState();
@@ -50,7 +52,7 @@ class _CommunityCommentIconState extends State<CommunityCommentIcon> {
                   ),
                   Expanded(
                     child: CommunityComments(
-                      communityId: 1,
+                      communityId: widget.communityId,
                     ),
                   ),
                   Padding(

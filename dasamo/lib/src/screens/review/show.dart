@@ -191,7 +191,7 @@ class _ReviewShowState extends State<ReviewShow> {
                         },
                       ),
                       SizedBox(width: 5),
-                      CommentIcon(),
+                      CommentIcon(reviewId: widget.reviewId),
                       SizedBox(width: 5),
                       BookmarkIcon(
                         isBookmarked: isBookmarked,

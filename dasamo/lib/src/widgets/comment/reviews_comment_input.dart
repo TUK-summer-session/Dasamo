@@ -1,4 +1,5 @@
 import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,6 +15,7 @@ class ReviewsCommentInput extends StatefulWidget {
 class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
   TextEditingController _textEditingController = TextEditingController();
   late ReviewsCommentsController _reviewsCommentsController;
+  final UserController userController = Get.put(UserController());
 
   @override
   void initState() {
@@ -30,6 +32,8 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
 
   @override
   Widget build(BuildContext context) {
+    final int memberId = int.parse(userController.userId.value);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
@@ -67,8 +71,8 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
               onPressed: () async {
                 String comment = _textEditingController.text;
                 if (comment.isNotEmpty) {
-                  await _reviewsCommentsController
-                      .postComment(comment); // 댓글을 POST합니다.
+                  await _reviewsCommentsController.postComment(
+                      memberId, comment); // 댓글을 POST합니다.
                   _textEditingController.clear(); // 입력창 초기화
                 }
               },

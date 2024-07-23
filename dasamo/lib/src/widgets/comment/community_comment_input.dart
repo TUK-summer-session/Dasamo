@@ -1,4 +1,5 @@
 import 'package:dasamo/src/controllers/community_comments_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,6 +16,7 @@ class CommunityCommentInput extends StatefulWidget {
 class _CommunityCommentInputState extends State<CommunityCommentInput> {
   TextEditingController _textEditingController = TextEditingController();
   late CommunityCommentsController _communityCommentsController;
+  final UserController userController = Get.put(UserController());
 
   @override
   void initState() {
@@ -31,6 +33,8 @@ class _CommunityCommentInputState extends State<CommunityCommentInput> {
 
   @override
   Widget build(BuildContext context) {
+    final int memberId = int.parse(userController.userId.value);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
@@ -68,8 +72,8 @@ class _CommunityCommentInputState extends State<CommunityCommentInput> {
               onPressed: () async {
                 String comment = _textEditingController.text;
                 if (comment.isNotEmpty) {
-                  await _communityCommentsController
-                      .postComment(comment); // 댓글을 POST합니다.
+                  await _communityCommentsController.postComment(
+                      memberId, comment); // 댓글을 POST합니다.
                   _textEditingController.clear(); // 입력창 초기화
                 }
               },

@@ -1,20 +1,16 @@
 import 'dart:io';
 
-import 'package:dasamo/src/home.dart';
-import 'package:dasamo/src/screens/review/index.dart';
-import 'package:dasamo/src/shared/review/tag_data.dart';
-import 'package:dasamo/src/widgets/buttons/tags/select_tag_button.dart';
-import 'package:dasamo/src/widgets/list/star_list_widget.dart';
-import 'package:dasamo/src/controllers/community_controller.dart'; // 컨트롤러를 임포트하세요
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:dasamo/src/screens/community_page.dart';
 import 'package:dasamo/src/widgets/modal/more_bottom_modal.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dasamo/src/controllers/community_controller.dart';
 
 class NewCommunity extends StatefulWidget {
-  const NewCommunity({super.key, r});
+  const NewCommunity({super.key});
 
   @override
   State<NewCommunity> createState() => _NewCommunityState();
@@ -24,7 +20,7 @@ class _NewCommunityState extends State<NewCommunity> {
   final TextEditingController _contentController = TextEditingController();
   final CommunityController _communityController =
       Get.put(CommunityController());
-
+  final UserController userController = Get.put(UserController());
   File? _image;
   final ImagePicker _picker = ImagePicker();
 
@@ -63,14 +59,17 @@ class _NewCommunityState extends State<NewCommunity> {
       return;
     }
 
+    final int memberId =
+        int.parse(userController.userId.value); // memberId를 적절히 설정합니다.
+
     await _communityController.submitFeed(
-      memberId: 1, // 실제 멤버 ID로 변경하세요
+      memberId: memberId,
       detail: _contentController.text,
       imageFile: _image,
     );
 
-    // 성공적으로 제출된 경우, 홈 화면으로 이동
-    Get.to(CommunityPage());
+    // 성공적으로 제출된 경우, 커뮤니티 페이지로 이동
+    Get.to(() => CommunityPage());
   }
 
   @override
