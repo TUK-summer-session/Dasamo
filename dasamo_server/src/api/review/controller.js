@@ -75,51 +75,6 @@ exports.products = async (req, res) => {
   }
 };
 
-// // multer 미들웨어를 사용하여 파일 업로드 처리
-// exports.store = [
-//   upload.single('image'), // 클라이언트에서 전송하는 파일 필드의 이름
-//   async (req, res) => {
-//     console.log("Store Review");
-//     const { memberId, title, detail, productId, score, tagIds } = req.body;
-//     const file = req.file;
-
-//     try {
-//       // 1. Review 객체 생성
-//       const result = await db.query(
-//         "INSERT INTO Review (memberId, title, detail, productId, score, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-//         [memberId, title, detail, productId, score]
-//       );
-
-//       const reviewId = result.insertId;
-
-//       // 2. SelectedTag 객체 생성
-//       const tags = tagIds.split("/");
-//       for (const tagId of tags) {
-//         await db.query(
-//           "INSERT INTO SelectedTag (reviewId, tagId) VALUES (?, ?)",
-//           [reviewId, tagId]
-//         );
-//       }
-
-//       // 3. ReviewImage 객체 생성
-//       const imageUrl = file ? `http://localhost:3000/uploads/${file.filename}` : "https://cdn.pixabay.com/photo/2016/09/20/07/25/food-1681977_1280.png";
-
-//       await db.query(
-//         "INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)",
-//         [imageUrl, reviewId]
-//       );
-
-//       const response = createResponse(200, "리뷰가 성공적으로 생성되었습니다.", {
-//         reviewId,
-//       });
-//       res.send(response);
-//     } catch (error) {
-//       console.error("Query error:", error);
-//       res.status(500).send(createResponse(500, "서버 오류"));
-//     }
-//   }
-// ];
-
 exports.store = async (req, res) => {
     console.log("Store Review");
     const { memberId, title, detail, productId, score, tagIds } = req.body;
@@ -439,8 +394,7 @@ exports.getTags = async (req, res) => {
   }
 };
 
-exports.like = (req, res) => {
-  res.send(`Like review ${req.params.reviewId}`);
+
 // 좋아요 추가
 exports.storeLike = async (req, res) => {
     const memberId = req.body.memberId;
@@ -467,8 +421,7 @@ exports.storeLike = async (req, res) => {
     }
 };
 
-exports.scrap = (req, res) => {
-  res.send(`Scrap review ${req.params.reviewId}`);
+
 // 좋아요 취소
 exports.unlike = async (req, res) => {
     const memberId = req.body.memberId;
@@ -495,8 +448,6 @@ exports.unlike = async (req, res) => {
     }
 };
 
-exports.unlike = (req, res) => {
-  res.send(`Unlike review ${req.params.reviewId}`);
 exports.scrap = async (req, res) => {
     console.log(`Scrap review ${req.params.reviewId}`);
     const memberId = req.body.memberId;
@@ -523,9 +474,6 @@ exports.scrap = async (req, res) => {
     }
 };
 
-exports.unscrap = (req, res) => {
-  res.send(`Unscrap review ${req.params.reviewId}`);
-
 exports.unscrap = async (req, res) => {
     console.log(`Unscrap review ${req.params.reviewId}`);
     const memberId = req.body.memberId;
@@ -550,5 +498,6 @@ exports.unscrap = async (req, res) => {
         console.error("Query error:", error);
         res.status(500).send(createResponse(500, "서버 에러"));
     }
-};
+    
+}
 
