@@ -14,7 +14,7 @@ import 'package:dasamo/src/widgets/modal/review_action_sheet.dart';
 
 class ReviewShow extends StatefulWidget {
   final int reviewId;
-  const ReviewShow({required this.reviewId, Key? key}) : super(key: key);
+  const ReviewShow({required this.reviewId, super.key});
 
   @override
   State<ReviewShow> createState() => _ReviewShowState();
@@ -35,10 +35,34 @@ class _ReviewShowState extends State<ReviewShow> {
     return reviewController.reviewDetails[reviewId] ?? {};
   }
 
+  Future<void> toggleBookMark(bool isBookmarked) async {
+    final ReviewController reviewController = Get.put(ReviewController());
+    final UserController userController = Get.put(UserController());
+
+    final memberId = int.parse(userController.userId.value);
+
+    print("bookmark User ID: $memberId");
+
+    try {
+      if (isBookmarked) {
+        await reviewController.unbookmarkReview(widget.reviewId, memberId);
+      } else {
+        await reviewController.bookmarkReview(widget.reviewId, memberId);
+      }
+
+      setState(() {
+        _reviewData = fetchReviewData(widget.reviewId);
+      });
+    } catch (e) {
+      Get.snackbar('오류', '북마크 상태를 변경할 수 없습니다.');
+    }
+  }
+
   Future<void> toggleLike(bool isLiked) async {
     final ReviewController reviewController = Get.put(ReviewController());
     final UserController userController = Get.put(UserController());
     final memberId = int.parse(userController.userId.value);
+    print("like User ID: $memberId");
 
     try {
       if (isLiked) {
@@ -46,7 +70,7 @@ class _ReviewShowState extends State<ReviewShow> {
       } else {
         await reviewController.likeReview(widget.reviewId, memberId);
       }
-      // Refresh data after toggling like
+
       setState(() {
         _reviewData = fetchReviewData(widget.reviewId);
       });
@@ -58,26 +82,24 @@ class _ReviewShowState extends State<ReviewShow> {
   @override
   void dispose() {
     final ReviewController reviewController = Get.find<ReviewController>();
-    reviewController.fetchReviews(); // Fetch reviews when popping back
+    reviewController.fetchReviews();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final ReviewController reviewController = Get.put(ReviewController());
-    final UserController userController = Get.put(UserController());
+    final ReviewController reviewController = Get.find<ReviewController>();
+    final UserController userController = Get.find<UserController>();
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // Call fetchReviews before popping back
             reviewController.fetchReviews();
             Navigator.pop(context);
           },
         ),
-        centerTitle: false,
         actions: [
           FutureBuilder<Map<String, dynamic>>(
             future: _reviewData,
@@ -85,17 +107,16 @@ class _ReviewShowState extends State<ReviewShow> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
               }
-
               if (snapshot.hasError) {
                 return Center(child: Text('Failed to load data'));
               }
-
               if (!snapshot.hasData ||
                   !snapshot.data!.containsKey('isAuthor')) {
                 return Container();
               }
 
               final isAuthor = snapshot.data!['isAuthor'];
+              final currentUserId = userController.userId.value;
 
               if (isAuthor) {
                 return IconButton(
@@ -105,10 +126,10 @@ class _ReviewShowState extends State<ReviewShow> {
                       builder: (context) {
                         return ReviewActionSheet(
                           onDelete: () {
-                            final memberId = userController.userId.value;
-                            print('User ID: $memberId');
                             reviewController.deleteReview(
-                                widget.reviewId, memberId);
+                              widget.reviewId,
+                              currentUserId,
+                            );
                           },
                         );
                       },
@@ -138,29 +159,23 @@ class _ReviewShowState extends State<ReviewShow> {
         final product = reviewData['product'];
         final writer = reviewData['writer'];
 
-        // Determine initial isFavorited based on likeCount
-        final isFavorited = reviewDetail['likeCount'] == 1;
-
+        final isFavorited = reviewDetail['isLiked'];
+        final isBookmarked = reviewDetail['isScraped'];
+        print('isFavorited: $isFavorited , isBookmarked: $isBookmarked');
         final List<String> tags = reviewDetail['tags'].split('/');
 
         return ListView(
           children: <Widget>[
-            // Profile
             WriterInfo(
               authorName: writer['name'],
               postDate: reviewDetail['createdAt'],
               profileImage: writer['profileImageUrl'],
               starRating: reviewDetail['score'],
             ),
-
             const SizedBox(height: 10),
-
-            // Review Image
             ReviewImage(
               imageUrl: reviewDetail['imageUrl'],
             ),
-
-            // Heart, Comment, Bookmark
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 16),
               child: Row(
@@ -178,14 +193,13 @@ class _ReviewShowState extends State<ReviewShow> {
                       CommentIcon(),
                       SizedBox(width: 5),
                       BookmarkIcon(
-                        isBookmarked: reviewDetail['isScraped'],
+                        isBookmarked: isBookmarked,
                         onTap: (isBookmarked) {
-                          // Handle bookmark tap
+                          toggleBookMark(isBookmarked);
                         },
                       ),
                     ],
                   ),
-                  // Tag Buttons
                   Row(
                     children: List.generate(tags.length, (index) {
                       return Padding(
@@ -197,11 +211,7 @@ class _ReviewShowState extends State<ReviewShow> {
                 ],
               ),
             ),
-
-            // Purchase Button
             GoodsListItem(item: product),
-
-            // Review Content
             ShowReviewContent(item: reviewDetail),
           ],
         );

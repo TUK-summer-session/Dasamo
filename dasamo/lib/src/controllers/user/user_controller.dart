@@ -12,10 +12,10 @@ class UserController extends GetxController {
   var member = Rxn<Map<String, dynamic>>();
 
   void setUser(String id, String name, String mail, String profileUrl) {
-    userId.value = id ?? '';
-    nickname.value = name ?? '';
-    email.value = mail ?? '';
-    profileImageUrl.value = profileUrl ?? '';
+    userId.value = id;
+    nickname.value = name;
+    email.value = mail;
+    profileImageUrl.value = profileUrl;
   }
 
   Future<void> signWithKakao() async {

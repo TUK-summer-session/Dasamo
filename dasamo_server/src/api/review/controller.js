@@ -31,6 +31,10 @@ exports.index = async (req, res) => {
           "SELECT COUNT(*) AS count FROM `Like` WHERE feedId = ? AND state = 1",
           [review.reviewId]
         );
+        const bookMarkState = await db.query(
+          "SELECT COUNT(*) AS count FROM `Scrap` WHERE feedId = ? AND state = 1",
+          [review.reviewId]
+        )
         const questionCount = await db.query(
           "SELECT COUNT(*) AS count FROM Question WHERE reviewId = ?",
           [review.reviewId]

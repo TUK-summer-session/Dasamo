@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 
 class ReviewController extends GetxController {
   RxList<Map<String, dynamic>> reviewList = <Map<String, dynamic>>[].obs;
   List<Map<String, dynamic>> allReviews = [];
-  RxMap<int, Map<String, dynamic>> reviewDetails = <int, Map<String, dynamic>>{}.obs;
+  RxMap<int, Map<String, dynamic>> reviewDetails =
+      <int, Map<String, dynamic>>{}.obs;
+
+  final UserController userController = Get.put(UserController());
 
   @override
   void onInit() {
@@ -16,7 +20,8 @@ class ReviewController extends GetxController {
 
   Future<void> fetchReviews() async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:3000/api/reviews'));
+      final response =
+          await http.get(Uri.parse('http://10.0.2.2:3000/api/reviews'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -26,7 +31,8 @@ class ReviewController extends GetxController {
             'id': review['reviewId'],
             'title': review['title'],
             'description': review['detail'],
-            'imageFile': review['imageUrl'] ?? 'https://via.placeholder.com/150',
+            'imageFile':
+                review['imageUrl'] ?? 'https://via.placeholder.com/150',
             'tagKind': review['tags'].split('/'),
             'like': review['likeCount'],
             'comment': review['questionCount'],
@@ -45,7 +51,9 @@ class ReviewController extends GetxController {
 
   Future<void> fetchReviewData(int reviewId) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:3000/api/reviews/$reviewId'));
+      final response = await http.get(
+          Uri.parse('http://10.0.2.2:3000/api/reviews/$reviewId').replace(
+              queryParameters: {'memberId': userController.userId.toString()}));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
@@ -180,6 +188,52 @@ class ReviewController extends GetxController {
       }
     } catch (e) {
       print('Error unliking review: $e');
+      throw e;
+    }
+  }
+
+  Future<void> bookmarkReview(int reviewId, int memberId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:3000/api/reviews/scrap/$reviewId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'memberId': memberId}),
+      );
+
+      if (response.statusCode == 200) {
+        if (reviewDetails.containsKey(reviewId)) {
+          reviewDetails[reviewId]!['reviewDetail']['isBookmarked'] = true;
+        }
+      } else {
+        throw Exception('Failed to bookmark review');
+      }
+    } catch (e) {
+      print('Error bookmarking review: $e');
+      throw e;
+    }
+  }
+
+  Future<void> unbookmarkReview(int reviewId, int memberId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:3000/api/reviews/scrap/$reviewId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'memberId': memberId}),
+      );
+
+      if (response.statusCode == 200) {
+        if (reviewDetails.containsKey(reviewId)) {
+          reviewDetails[reviewId]!['reviewDetail']['isBookmarked'] = false;
+        }
+      } else {
+        throw Exception('Failed to unbookmark review');
+      }
+    } catch (e) {
+      print('Error unbookmarking review: $e');
       throw e;
     }
   }

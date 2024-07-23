@@ -7,8 +7,8 @@ class HeartIcon extends StatefulWidget {
   const HeartIcon({
     required this.isFavorited,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _HeartIconState createState() => _HeartIconState();
