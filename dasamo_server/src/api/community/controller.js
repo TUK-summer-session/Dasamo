@@ -114,11 +114,21 @@ exports.store = [
         return res.status(500).send(createResponse(500, "커뮤니티 생성 실패"));
       }
 
+      const successImage = "https://img1.daumcdn.net/thumb/R658x0.q70/?fname=https://t1.daumcdn.net/news/202105/21/dailylife/20210521220226237nxoo.jpg";
+      const failImage = "https://cdn.pixabay.com/photo/2016/09/20/07/25/food-1681977_1280.png";
       // 이미지 URL을 CommunityImage 테이블에 삽입
-      await db.query(
-        "INSERT INTO CommunityImage (communityId, url) VALUES (?, ?)",
-        [communityId, file.path] // order 열 제거
-      );
+      if (file) {
+        await db.query(
+          "INSERT INTO CommunityImage (communityId, url) VALUES (?, ?)",
+          [communityId, successImage] // 성공하면 콩
+        );
+      } else {
+        await db.query(
+          "INSERT INTO CommunityImage (communityId, url) VALUES (?, ?)",
+          [communityId, failImage] // 이미지 업로드 실패하면 사과
+        );
+      }
+
 
       const response = createResponse(200, "커뮤니티 저장 성공", {
         communityId,
@@ -190,37 +200,43 @@ exports.update = [
   },
 ];
 
-// 커뮤니티 삭제 -- 수정 필요
+// 커뮤니티 삭제 
 exports.deleteCommunity = async (req, res) => {
-  const { communityId } = req.body;
+  const memberId = req.body.memberId;
+  const communityId = req.params.communityId;
 
-  if (!communityId) {
+  if (!memberId) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
   try {
-    const community = await repository.getCommunityById(communityId);
+    const isOwned = repository.checkCommunityOwnership(memberId, communityId);
 
-    if (!community) {
+    if (!isOwned) {
       return res
-        .status(400)
-        .send(createResponse(400, "존재하지 않는 커뮤니티입니다."));
+        .status(404)
+        .send(createResponse(404, "삭제 권한이 없거나 존재하지 않는 커뮤니티입니다."));
     }
 
-    await db.query("DELETE FROM Comment WHERE community_id = ?", [communityId]);
-
     const imagePaths = await db.query(
-      "SELECT url FROM CommunityImage WHERE community_id = ?",
+      "SELECT url FROM CommunityImage WHERE communityId = ?",
       [communityId]
     );
-
-    await repository.deleteCommunityById(communityId);
 
     imagePaths.forEach((image) => {
       if (fs.existsSync(image.url)) {
         fs.unlinkSync(image.url);
       }
     });
+
+    // 1. 이미지 삭제
+    await repository.deleteImageByCommunityId(communityId);
+    // 2. 댓글 삭제
+    await repository.deleteCommentByCommunityId(communityId);
+    // 3. 좋아요 삭제
+    await repository.deleteLikesByCommunityId(communityId);
+    // 4. 본문 삭제
+    await repository.deleteCommunityById(communityId);
 
     const response = createResponse(200, "커뮤니티 및 관련 데이터 삭제 성공");
     res.status(200).send(response);
@@ -232,8 +248,8 @@ exports.deleteCommunity = async (req, res) => {
 
 // 댓글 조회
 exports.getComments = async (req, res) => {
-    const communityIdString = req.params.communityId;
-    const communityId = parseInt(communityIdString, 10);
+  const communityIdString = req.params.communityId;
+  const communityId = parseInt(communityIdString, 10);
 
   try {
     const comments = await repository.getCommentsByCommunityId(communityId);
@@ -254,7 +270,7 @@ exports.storeComment = async (req, res) => {
   const communityId = req.params.communityId;
   const { memberId, isCommentForComment, parentComment, detail } = req.body;
 
-  if ( !memberId || !detail ) {
+  if (!memberId || !detail) {
     return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
   }
 
@@ -281,7 +297,7 @@ exports.deleteComment = async (req, res) => {
 
   try {
     const isOwned = await repository.checkCommentOwnership(commentId, memberId);
-    
+
     if (!isOwned) {
       console.log('Comment not found or you do not have permission to delete this comment.');
       return res.status(404).send(createResponse(404, '댓글을 찾을 수 없거나 삭제 권한이 없습니다.'));

@@ -50,7 +50,7 @@ router.get('/api/tag', apiReviewController.getTags);
 router.get('/api/community', apiCommunityController.index); // 쿼리로 memberId
 router.post('/api/community', apiCommunityController.store);
 router.put('/api/community/:communityId', apiCommunityController.update);
-router.delete('/api/community/image', apiCommunityController.deleteCommunity);
+router.delete('/api/community/:communityId', apiCommunityController.deleteCommunity);
 router.get('/api/community/comments/:communityId', apiCommunityController.getComments);
 router.post('/api/community/comments/:communityId', apiCommunityController.storeComment);
 router.delete('/api/community/comments/:commentId', apiCommunityController.deleteComment);
