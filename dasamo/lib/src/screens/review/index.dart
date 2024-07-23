@@ -54,8 +54,9 @@ class _ReviewIndexState extends State<ReviewIndex> {
       ),
       appBar: AppBar(
         centerTitle: false,
-        leading: Icon(Icons.menu),
         title: const Text('리뷰'),
+        leading: SizedBox.shrink(),
+        leadingWidth: 0,
       ),
       body: Column(
         children: [

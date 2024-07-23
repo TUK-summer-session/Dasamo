@@ -130,6 +130,7 @@ class _ReviewShowState extends State<ReviewShow> {
                               widget.reviewId,
                               currentUserId,
                             );
+                            Navigator.pop(context);
                           },
                         );
                       },
