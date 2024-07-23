@@ -84,16 +84,16 @@ exports.store = async (req, res) => {
     console.log("Store Review");
     const { memberId, title, detail, productId, score, tagIds } = req.body;
     const file = req.file;
+    
   
     try {
       // `memberId`를 숫자로 변환
-      const numericMemberId = BigInt(memberId);
       console.log("memberId: ", memberId);
   
       // 1. Review 객체 생성
       const result = await db.query(
         "INSERT INTO Review (memberId, title, detail, productId, score, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-        [numericMemberId, title, detail, productId, score]
+        [memberId, title, detail, productId, score]
       );
   
       const reviewId = result.insertId;
@@ -111,7 +111,7 @@ exports.store = async (req, res) => {
         if (file) {
             await db.query(
                 'INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)',
-                ["https://img1.daumcdn.net/thumb/R658x0.q70/?fname=https://t1.daumcdn.net/news/202105/21/dailylife/20210521220226237nxoo.jpg", reviewId] // 원래는 [file.path, reviewId] 로 s3업로드 url을 주지만 일단 임시 url 넣음, 콩 나오면 성공
+                [file.location, reviewId] 
             );
         } else {
             await db.query(

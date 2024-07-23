@@ -9,6 +9,7 @@ const apiReviewController = require('../api/review/controller');
 const apiCommunityController = require('../api/community/controller');
 
 const { logRequestTime } = require('../middleware/log');
+const { s3upload } = require('../config/multer');
 
 // router.get('/', webController.home);
 // router.get('/page/:route', logRequestTime, webController.page);
@@ -20,6 +21,12 @@ router.post('/file', upload.single('file'), (req, res) => {
     res.json(req.file);
 });
 
+// 테스트
+router.post('/img', s3upload.single('img'), (req, res) => {
+    console.log(req.file);
+    res.json({ url: req.file.location });
+  });
+
 // Member APIs
 router.post('/api/members/login', apiMemberController.login);
 router.post('/api/members/signup', apiMemberController.signup);
@@ -30,7 +37,7 @@ router.post('/api/members/notice', apiMemberController.clearNotice);
 // Review APIs
 router.get('/api/reviews', apiReviewController.index);
 router.get('/api/reviews/products', apiReviewController.products);
-router.post('/api/reviews', upload.single('file'), apiReviewController.store);
+router.post('/api/reviews', s3upload.single('file'), apiReviewController.store);
 router.post('/api/reviews/image', apiReviewController.uploadImage);
 router.delete('/api/reviews/image', apiReviewController.deleteImage);
 router.get('/api/reviews/:reviewId', apiReviewController.getDetail);    // 쿼리로 memberId
@@ -48,7 +55,7 @@ router.get('/api/tag', apiReviewController.getTags);
 
 // Community APIs
 router.get('/api/community', apiCommunityController.index); // 쿼리로 memberId
-router.post('/api/community', apiCommunityController.store);
+router.post('/api/community', s3upload.single('file'), apiCommunityController.store);
 router.put('/api/community/:communityId', apiCommunityController.update);
 router.delete('/api/community/:communityId', apiCommunityController.deleteCommunity);
 router.get('/api/community/comments/:communityId', apiCommunityController.getComments);
