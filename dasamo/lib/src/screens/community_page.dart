@@ -1,21 +1,23 @@
-import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dasamo/src/controllers/community_controller.dart';
+import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
 import 'package:dasamo/src/screens/new_community.dart';
 import 'package:dasamo/src/screens/alarm_page.dart';
 import 'package:dasamo/src/widgets/modal/comment_modal.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
-import 'package:dasamo/src/controllers/comments_controller.dart';
 
 class CommunityPage extends StatelessWidget {
   final CommunityController communityController =
       Get.put(CommunityController());
 
-  final CommentsController commentsController =
-      Get.put(CommentsController()); // CommentsController 등록
+  CommunityPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // 데이터 초기 로드
+    communityController.fetchCommunities();
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'addTag2',
@@ -49,7 +51,7 @@ class CommunityPage extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        if (communityController.communityData.isEmpty) {
+        if (communityController.communityList.isEmpty) {
           return Center(
             child: Text('데이터가 없습니다.'),
           );
@@ -58,13 +60,13 @@ class CommunityPage extends StatelessWidget {
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: communityController.communityData.map((community) {
+            children: communityController.communityList.map((community) {
               final int communityId = community['communityId'];
               final member = community['member'];
               final image = community['image'];
 
               if (member == null) {
-                return SizedBox.shrink(); // member가 null이면 빈 공간 반환
+                return SizedBox.shrink();
               }
 
               return Column(
@@ -128,7 +130,8 @@ class CommunityPage extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(image['url']),
+                          image: NetworkImage(
+                              'http://10.0.2.2:3000/${image['url']}'),
                           fit: BoxFit.cover,
                         ),
                         boxShadow: [
@@ -151,39 +154,36 @@ class CommunityPage extends StatelessWidget {
                         Row(
                           children: <Widget>[
                             InkWell(
-                              onHover: (hovered) {
-                                // Hover 상태를 처리하는 로직
-                              },
                               onTap: () {
-                                // 좋아요 클릭 이벤트 처리
                                 print(
                                     'Heart icon tapped for communityId: $communityId');
                               },
                               child: Icon(
                                 Icons.favorite_border,
-                                color: Colors.grey, // 기본 색상
+                                color: Colors.grey,
                               ),
                             ),
                             SizedBox(width: 5),
-                            InkWell(
-                              onHover: (hovered) {
-                                // Hover 상태를 처리하는 로직
-                              },
-                              onTap: () {
-                                commentsController.fetchComments();
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (context) => CommentModal(),
-                                );
-                                print(
-                                    'Comment icon tapped for communityId: $communityId');
-                              },
-                              child: Icon(
-                                Icons.chat_bubble_outline,
-                                color: Colors.grey, // 기본 색상
-                              ),
-                            ),
+                            // InkWell(
+                            //   onTap: () {
+                            //     final commentsController = ReviewsCommentsController(communityId);
+                            //     commentsController.fetchComments();
+
+                            //     showModalBottomSheet(
+                            //       context: context,
+                            //       isScrollControlled: true,
+                            //       builder: (context) => CommentModal(
+                            //         commentsController: commentsController,
+                            //         reviewId: communityId,
+                            //       ),
+                            //     );
+                            //     print('Comment icon tapped for communityId: $communityId');
+                            //   },
+                            //   child: Icon(
+                            //     Icons.chat_bubble_outline,
+                            //     color: Colors.grey,
+                            //   ),
+                            // ),
                           ],
                         ),
                       ],
