@@ -73,23 +73,6 @@ exports.products = async (req, res) => {
     console.log("Query error : ", error);
     res.status(500).send(createResponse(500, "서버 오류"));
   }
-
-  // const { brandSearch, productSearch } = req.body;
-
-  // try {
-  //     const products = await repository.searchProducts(brandSearch, productSearch);
-  //     const formattedProducts = products.map(product => ({
-  //         productId: product.productId,
-  //         productName: product.name,
-  //         brandName: product.brand
-  //     }));
-
-  //     const response = createResponse(200, '제품 리스트가 성공적으로 반환되었습니다.', { products: formattedProducts });
-  //     res.send(response);
-  // } catch (error) {
-  //     console.error('Query error:', error);
-  //     res.status(500).send(createResponse(500, '서버 오류'));
-  // }
 };
 
 // // multer 미들웨어를 사용하여 파일 업로드 처리
@@ -166,7 +149,7 @@ exports.store = async (req, res) => {
   
       // 3. ReviewImage 객체 생성
       const imageUrl = file
-        ? `http://localhost:3000/uploads/${file.filename}`
+        ? ''
         : "https://cdn.pixabay.com/photo/2016/09/20/07/25/food-1681977_1280.png";
       await db.query("INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)", [
         imageUrl,
@@ -185,7 +168,6 @@ exports.store = async (req, res) => {
   
 
 exports.uploadImage = (req, res) => {
-  s;
   res.send("Upload review image");
 };
 

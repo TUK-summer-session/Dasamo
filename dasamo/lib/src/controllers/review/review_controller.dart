@@ -28,7 +28,8 @@ class ReviewController extends GetxController {
             'id': review['reviewId'],
             'title': review['title'],
             'description': review['detail'],
-            'imageUrl': review['imageUrl'] ?? 'https://via.placeholder.com/150',
+            'imageFile':
+                review['imageUrl'] ?? 'https://via.placeholder.com/150',
             'tagKind': review['tags'].split('/'),
             'like': review['likeCount'],
             'comment': review['questionCount'],
@@ -70,8 +71,7 @@ class ReviewController extends GetxController {
     required List<int> tagIds,
     File? imageFile,
   }) async {
-    final uri =
-        Uri.parse('http://10.0.2.2:3000/api/reviews'); // API URL을 변경하세요
+    final uri = Uri.parse('http://10.0.2.2:3000/api/reviews'); // API URL을 변경하세요
 
     final request = http.MultipartRequest('POST', uri)
       ..fields['memberId'] = memberId.toString()

@@ -9,12 +9,13 @@ class UserController extends GetxController {
   var nickname = ''.obs;
   var email = ''.obs;
   var profileImageUrl = ''.obs;
+  var member = Rxn<Map<String, dynamic>>();
 
   void setUser(String id, String name, String mail, String profileUrl) {
-    userId.value = id;
-    nickname.value = name;
-    email.value = mail;
-    profileImageUrl.value = profileUrl;
+    userId.value = id ?? '';
+    nickname.value = name ?? '';
+    email.value = mail ?? '';
+    profileImageUrl.value = profileUrl ?? '';
   }
 
   Future<void> signWithKakao() async {
@@ -54,12 +55,6 @@ class UserController extends GetxController {
           '\n회원번호: ${user.id}'
           '\n닉네임: ${user.kakaoAccount?.profile?.nickname}'
           '\n이메일: ${user.kakaoAccount?.email}');
-      setUser(
-        user.id.toString(),
-        user.kakaoAccount?.profile?.nickname ?? '',
-        user.kakaoAccount?.email ?? '',
-        user.kakaoAccount?.profile?.profileImageUrl ?? '',
-      );
       await _sendUserInfoToServer(user);
     } catch (error) {
       print('사용자 정보 요청 실패 $error');
@@ -83,6 +78,15 @@ class UserController extends GetxController {
 
     if (response.statusCode == 200) {
       print('서버로 사용자 정보 전송 성공');
+      var responseBody = jsonDecode(response.body);
+      member.value = responseBody['data']['member'];
+      setUser(
+          member.value?['memberId'].toString() ?? '',
+          member.value?['nickname'] ?? '',
+          member.value?['email'] ?? '',
+          member.value?['profileImageUrl'] ?? '');
+
+      print('유저 아이디: $userId');
     } else {
       print('서버로 사용자 정보 전송 실패: ${response.body}');
     }

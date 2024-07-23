@@ -38,7 +38,7 @@ class _ReviewShowState extends State<ReviewShow> {
   @override
   Widget build(BuildContext context) {
     final ReviewController reviewController = Get.find();
-    final UserController userController = Get.find();
+    final UserController userController = Get.put(UserController());
 
     return Scaffold(
       appBar: AppBar(
@@ -75,6 +75,7 @@ class _ReviewShowState extends State<ReviewShow> {
                           },
                           onDelete: () {
                             final memberId = userController.userId.value;
+                            print('유저 아이디 : $memberId');
                             reviewController.deleteReview(
                                 widget.reviewId, memberId);
                           },
