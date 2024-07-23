@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ReviewActionSheet extends StatelessWidget {
-  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   const ReviewActionSheet({
-    required this.onEdit,
     required this.onDelete,
     super.key,
   });
@@ -17,14 +15,6 @@ class ReviewActionSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ListTile(
-            leading: Icon(Icons.edit_outlined, color: Colors.black54),
-            title: Text('수정하기'),
-            onTap: () {
-              Navigator.pop(context);
-              onEdit();
-            },
-          ),
           ListTile(
             leading: Icon(Icons.delete_outline_outlined, color: Colors.red),
             title: Text('삭제하기'),

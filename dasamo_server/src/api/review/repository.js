@@ -196,7 +196,7 @@ module.exports = {
     unlikeReviewPost,
     checkIfAlreadyScraped,
     scrapReviewPost,
-    unscrapReviewPost
-    getAllProducts
+    unscrapReviewPost,
+    getAllProducts,
     deleteQuestionById,
 };

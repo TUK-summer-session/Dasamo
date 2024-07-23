@@ -1,3 +1,4 @@
+import 'package:dasamo/src/screens/review/show.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/review/review_controller.dart';
@@ -24,6 +25,18 @@ class _ReviewIndexState extends State<ReviewIndex> {
     reviewController.filterReviews(_selectedTag);
   }
 
+  Future<void> _navigateToReviewShow(int reviewId) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ReviewShow(reviewId: reviewId)),
+    );
+
+    if (result == true) {
+      // 새로고침 필요
+      reviewController.fetchReviews(); // 리뷰 목록 새로 고침
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,8 +44,7 @@ class _ReviewIndexState extends State<ReviewIndex> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const AddManufacturerInfo()),
+            MaterialPageRoute(builder: (context) => const AddManufacturerInfo()),
           );
         },
         child: Icon(

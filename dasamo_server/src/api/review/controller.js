@@ -38,6 +38,7 @@ exports.index = async (req, res) => {
 
         return {
           reviewId: review.reviewId,
+          memberId: review.memberId,
           title: review.title,
           detail: review.detail.substring(0, 20), // 미리보기용 20자로 자르기
           imageUrl: imageUrl,

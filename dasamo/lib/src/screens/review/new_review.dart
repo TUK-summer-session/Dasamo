@@ -34,9 +34,11 @@ class _NewReviewState extends State<NewReview> {
 
   List<int> _selectedTags = []; // 선택된 태그 ID 목록
   List<Tag> tagList = []; // 태그 목록
-  final ReviewController _reviewController = Get.find<ReviewController>();
+  final ReviewController _reviewController = Get.put(ReviewController());
 
   final UserController _userController = Get.put(UserController());
+
+  double _selectedRating = 5.0; // 선택된 별점 값
 
   @override
   void initState() {
@@ -136,7 +138,7 @@ class _NewReviewState extends State<NewReview> {
           title: _titleController.text,
           detail: _contentController.text,
           productId: productId,
-          score: 5.0, // 예제에서 하드코딩된 값, 실제로는 적절한 값을 설정해야 합니다.
+          score: _selectedRating,
           tagIds: _selectedTags,
           imageFile: _image,
         );
@@ -202,8 +204,10 @@ class _NewReviewState extends State<NewReview> {
         StarWidget(
           initialRating: 1,
           onRatingChanged: (rating) {
-            // 별점이 변경되었을 때의 동작을 여기에 구현합니다.
             print('Selected Rating: $rating');
+            setState(() {
+              _selectedRating = rating.toDouble();
+            });
           },
         ),
       ],
