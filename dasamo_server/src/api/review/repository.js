@@ -119,8 +119,8 @@ const deleteSelectedTagsByReviewId = async (reviewId) => {
     await db.query('DELETE FROM SelectedTag WHERE reviewId = ?', [reviewId]);
 };
 
-const deleteLikesByReviewId = async (reviewId) => {
-    await db.query('DELETE FROM `Like` WHERE feedId = ?', [reviewId]);
+const deleteLikesByReviewId = async (feedId) => {
+    await db.query('DELETE FROM `Like` WHERE feedId = ? AND likeType = ?', [feedId, 0]);
 };
 
 const deleteScrapsByReviewId = async (reviewId) => {

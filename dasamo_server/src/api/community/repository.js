@@ -5,6 +5,11 @@ const getCommunityById = async (communityId) => {
   return result.rows[0];
 };
 
+const checkCommunityOwnership = async (memberId, communityId) => {
+  const result = await db.query('SELECT * FROM Community WHERE communityId = ? AND memberId = ?', [communityId, memberId]);
+  return result.length > 0;
+}
+
 const getCommunitiesWithMembers = async (memberId) => {
   try {
     const result = await db.query(`
@@ -35,8 +40,21 @@ const getCommunitiesWithMembers = async (memberId) => {
 
 
 const deleteCommunityById = async (communityId) => {
-  await db.query("DELETE FROM Community WHERE community_id = $1", [communityId]);
+  await db.query("DELETE FROM Community WHERE communityId = ?", [communityId]);
 };
+
+const deleteImageByCommunityId = async (communityId) => {
+  await db.query('DELETE FROM CommunityImage WHERE communityId = ?', [communityId]);
+};
+
+const deleteCommentByCommunityId = async (communityId) => {
+  await db.query('DELETE FROM Comment WHERE communityId = ?', [communityId]);
+};
+
+const deleteLikesByCommunityId = async (feedId) => {
+  await db.query('DELETE FROM `Like` WHERE feedId = ? AND likeType = ?', [feedId, 1]);
+};
+
 
 const getCommentsByCommunityId = async (communityId) => {
   const comments = await db.query(`
@@ -103,7 +121,9 @@ const deleteCommentById = async (commentId) => {
 
 module.exports = {
   getCommunityById,
+  checkCommunityOwnership,
   deleteCommunityById,
+  deleteCommentByCommunityId,
   getCommentsByCommunityId,
   storeComment,
   checkIfAlreadyLiked,
@@ -113,4 +133,6 @@ module.exports = {
   checkIsLiked,
   deleteCommentById,
   checkCommentOwnership,
+  deleteImageByCommunityId,
+  deleteLikesByCommunityId,
 };
