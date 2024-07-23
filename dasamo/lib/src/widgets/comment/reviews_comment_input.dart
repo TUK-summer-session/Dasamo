@@ -1,16 +1,26 @@
+import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class CommentInput extends StatefulWidget {
+class ReviewsCommentInput extends StatefulWidget {
   final Function(String) onSave;
 
-  const CommentInput({Key? key, required this.onSave}) : super(key: key);
+  const ReviewsCommentInput({Key? key, required this.onSave}) : super(key: key);
 
   @override
-  _CommentInputState createState() => _CommentInputState();
+  _ReviewsCommentInputState createState() => _ReviewsCommentInputState();
 }
 
-class _CommentInputState extends State<CommentInput> {
+class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
   TextEditingController _textEditingController = TextEditingController();
+  late ReviewsCommentsController _reviewsCommentsController;
+
+  @override
+  void initState() {
+    super.initState();
+    _reviewsCommentsController =
+        Get.put(ReviewsCommentsController(1)); // 리뷰 ID를 1로 설정
+  }
 
   @override
   void dispose() {
@@ -54,10 +64,11 @@ class _CommentInputState extends State<CommentInput> {
             SizedBox(width: 8), // 아이콘과 TextField 사이 간격 조정
             IconButton(
               icon: Icon(Icons.arrow_upward), // 아이콘 설정
-              onPressed: () {
+              onPressed: () async {
                 String comment = _textEditingController.text;
                 if (comment.isNotEmpty) {
-                  widget.onSave(comment); // 입력된 댓글 onSave 함수에 전달
+                  await _reviewsCommentsController
+                      .postComment(comment); // 댓글을 POST합니다.
                   _textEditingController.clear(); // 입력창 초기화
                 }
               },

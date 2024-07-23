@@ -1,6 +1,7 @@
-import 'package:dasamo/src/widgets/comment/comment_input.dart';
-import 'package:dasamo/src/widgets/comment/comments.dart';
+import 'package:dasamo/src/widgets/comment/reviews_comment_input.dart';
+import 'package:dasamo/src/widgets/comment/reviews_comments.dart';
 import 'package:flutter/material.dart';
+
 class CommentIcon extends StatefulWidget {
   const CommentIcon({Key? key}) : super(key: key);
 
@@ -35,30 +36,26 @@ class _CommentIconState extends State<CommentIcon> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 40,
-                            alignment: Alignment.center,
-                            child: Container(
-                              height: 5,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                          ),
-                          Comments(),
-                        ],
+                  Container(
+                    height: 40,
+                    alignment: Alignment.center,
+                    child: Container(
+                      height: 5,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(30),
                       ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ReviewsComments(
+                      reviewId: 1,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: CommentInput(
+                    child: ReviewsCommentInput(
                       onSave: (comment) {
                         print('저장된 댓글: $comment');
                       },

@@ -145,21 +145,23 @@ exports.store = async (req, res) => {
           "INSERT INTO SelectedTag (reviewId, tagId) VALUES (?, ?)",
           [reviewId, tagId]
         );
-      }
-  
-      // 3. ReviewImage 객체 생성
-      const imageUrl = file
-        ? ''
-        : "https://cdn.pixabay.com/photo/2016/09/20/07/25/food-1681977_1280.png";
-      await db.query("INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)", [
-        imageUrl,
-        reviewId,
-      ]);
-  
-      const response = createResponse(200, "리뷰가 성공적으로 생성되었습니다.", {
-        reviewId,
-      });
-      res.send(response);
+        }
+
+        // 3. ReviewImage 객체 생성
+        if (file) {
+            await db.query(
+                'INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)',
+                ["https://img1.daumcdn.net/thumb/R658x0.q70/?fname=https://t1.daumcdn.net/news/202105/21/dailylife/20210521220226237nxoo.jpg", reviewId] // 원래는 [file.path, reviewId] 로 s3업로드 url을 주지만 일단 임시 url 넣음, 콩 나오면 성공
+            );
+        } else {
+            await db.query(
+                'INSERT INTO ReviewImage (url, reviewId) VALUES (?, ?)',
+                ["https://cdn.pixabay.com/photo/2016/09/20/07/25/food-1681977_1280.png", reviewId] // 사과 넣으면 파일 업로드 실패
+            );
+        }
+
+        const response = createResponse(200, '리뷰가 성공적으로 생성되었습니다.', { reviewId });
+        res.send(response);
     } catch (error) {
       console.error("Query error:", error);
       res.status(500).send(createResponse(500, `서버 오류`));
@@ -177,7 +179,7 @@ exports.deleteImage = (req, res) => {
 
 exports.getDetail = async (req, res) => {
     console.log(`Detail review ${req.params.reviewId}`);
-    const { memberId } = req.body;
+    const memberId = parseInt(req.query.memberId, 10);
     console.log(`memberId ${memberId}`);
     const reviewId = req.params.reviewId;
   
@@ -317,6 +319,7 @@ exports.delete = async (req, res) => {
     console.error("Query error:", error);
     res.status(500).send(createResponse(500, "서버 오류"));
   }
+
 };
 
 exports.update = (req, res) => {
@@ -339,6 +342,16 @@ exports.getQuestions = async (req, res) => {
     console.error("Query error:", error);
     res.status(500).send(createResponse(500, "서버 오류"));
   }
+    try {
+        const questions = await repository.getQuestionAllByReviewId(reviewId);
+        const response = createResponse(200, '리뷰 댓글이 성공적으로 조회되었습니다.', { questions });
+        res.send(response);
+
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
+
 };
 
 exports.storeQuestion = async (req, res) => {
@@ -357,6 +370,15 @@ exports.storeQuestion = async (req, res) => {
     console.error("Query error:", error);
     res.status(500).send(createResponse(500, "서버 오류"));
   }
+    try {
+        await repository.storeQuestions(createDTO);
+        const response = createResponse(200, '리뷰 댓글을 성공적으로 저장했습니다.');
+        res.send(response);
+
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).send(createResponse(500, '서버 오류'));
+    }
 };
 
 exports.deleteQuestion = async (req, res) => {
@@ -419,16 +441,114 @@ exports.getTags = async (req, res) => {
 
 exports.like = (req, res) => {
   res.send(`Like review ${req.params.reviewId}`);
+// 좋아요 추가
+exports.storeLike = async (req, res) => {
+    const memberId = req.body.memberId;
+    const feedId = req.params.reviewId;
+
+    if (!memberId || !feedId) {
+        return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
+    }
+
+    try {
+        const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, feedId);
+        if (alreadyLiked) {
+            return res
+                .status(401)
+                .send(createResponse(401, "이미 좋아요를 누른 게시글입니다."));
+        }
+
+        await repository.likeReviewPost(memberId, feedId);
+        const response = createResponse(200, "리뷰 좋아요 성공");
+        res.status(200).send(response);
+    } catch (error) {
+        console.error("Query error:", error);
+        res.status(500).send(createResponse(500, "서버 에러"));
+    }
 };
 
 exports.scrap = (req, res) => {
   res.send(`Scrap review ${req.params.reviewId}`);
+// 좋아요 취소
+exports.unlike = async (req, res) => {
+    const memberId = req.body.memberId;
+    const feedId = req.params.reviewId;
+
+    if (!memberId || !feedId) {
+        return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
+    }
+
+    try {
+        const alreadyLiked = await repository.checkIfAlreadyLiked(memberId, feedId);
+        if (!alreadyLiked) {
+            return res
+                .status(401)
+                .send(createResponse(401, "이미 리뷰 좋아요가 해제된 게시글입니다."));
+        }
+
+        await repository.unlikeReviewPost(memberId, feedId);
+        const response = createResponse(200, "리뷰 좋아요 취소 성공");
+        res.status(200).send(response);
+    } catch (error) {
+        console.error("Query error:", error);
+        res.status(500).send(createResponse(500, "서버 에러"));
+    }
 };
 
 exports.unlike = (req, res) => {
   res.send(`Unlike review ${req.params.reviewId}`);
+exports.scrap = async (req, res) => {
+    console.log(`Scrap review ${req.params.reviewId}`);
+    const memberId = req.body.memberId;
+    const feedId = req.params.reviewId;
+
+    if (!memberId || !feedId) {
+        return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
+    }
+
+    try {
+        const alreadyLiked = await repository.checkIfAlreadyScraped(memberId, feedId);
+        if (alreadyLiked) {
+            return res
+                .status(401)
+                .send(createResponse(401, "이미 스크랩한 게시글입니다."));
+        }
+
+        await repository.scrapReviewPost(memberId, feedId);
+        const response = createResponse(200, "리뷰 스크랩 성공");
+        res.status(200).send(response);
+    } catch (error) {
+        console.error("Query error:", error);
+        res.status(500).send(createResponse(500, "서버 에러"));
+    }
 };
 
 exports.unscrap = (req, res) => {
   res.send(`Unscrap review ${req.params.reviewId}`);
+
+exports.unscrap = async (req, res) => {
+    console.log(`Unscrap review ${req.params.reviewId}`);
+    const memberId = req.body.memberId;
+    const feedId = req.params.reviewId;
+
+    if (!memberId || !feedId) {
+        return res.status(400).send(createResponse(400, "요청이 잘못되었습니다."));
+    }
+
+    try {
+        const alreadyLiked = await repository.checkIfAlreadyScraped(memberId, feedId);
+        if (!alreadyLiked) {
+            return res
+                .status(401)
+                .send(createResponse(401, "이미 스크랩이 해제된 게시글입니다."));
+        }
+
+        await repository.unscrapReviewPost(memberId, feedId);
+        const response = createResponse(200, "리뷰 스크랩 취소 성공");
+        res.status(200).send(response);
+    } catch (error) {
+        console.error("Query error:", error);
+        res.status(500).send(createResponse(500, "서버 에러"));
+    }
 };
+
