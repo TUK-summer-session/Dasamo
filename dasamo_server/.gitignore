@@ -20,7 +20,7 @@ dist
 build
 
 # 로컬 환경 설정 파일
-#.env
+.env
 .env.test
 
 # IDE 설정 파일

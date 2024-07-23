@@ -86,7 +86,6 @@ const upload = multer({ storage: storage });
 
 // 커뮤니티 저장
 exports.store = [
-  upload.single("file"), // 단일 파일 업로드
   async (req, res) => {
     const { memberId, detail } = req.body;
     const file = req.file; // 단일 파일을 처리하기 위한 변수
@@ -113,19 +112,17 @@ exports.store = [
       if (!communityId) {
         return res.status(500).send(createResponse(500, "커뮤니티 생성 실패"));
       }
-
-      const successImage = "https://img1.daumcdn.net/thumb/R658x0.q70/?fname=https://t1.daumcdn.net/news/202105/21/dailylife/20210521220226237nxoo.jpg";
-      const failImage = "https://cdn.pixabay.com/photo/2016/09/20/07/25/food-1681977_1280.png";
+;
       // 이미지 URL을 CommunityImage 테이블에 삽입
       if (file) {
         await db.query(
           "INSERT INTO CommunityImage (communityId, url) VALUES (?, ?)",
-          [communityId, successImage] // 성공하면 콩
+          [communityId, file.location] // 성공하면 콩
         );
       } else {
         await db.query(
           "INSERT INTO CommunityImage (communityId, url) VALUES (?, ?)",
-          [communityId, failImage] // 이미지 업로드 실패하면 사과
+          [communityId, null] // 이미지 업로드 실패하면 사과
         );
       }
 
