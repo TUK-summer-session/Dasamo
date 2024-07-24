@@ -1,22 +1,26 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:dasamo/src/controllers/mypage_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:dasamo/src/widgets/modal/mypage_modal.dart';
 import 'package:dasamo/src/controllers/my_page_tab_controller.dart';
-import 'package:dasamo/src/shared/my_page_data.dart'; // 데이터를 가져오기 위해
 
 class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+  const MyPage({Key? key}) : super(key: key);
 
   @override
-  State<MyPage> createState() => _MyPageState();
+  _MyPageState createState() => _MyPageState();
 }
 
 class _MyPageState extends State<MyPage> {
-  final MyPageTabController controller = MyPageTabController();
+  final MyPageTabController tabController = MyPageTabController();
+  late MyPageController myPageController;
+  final UserController userController = Get.find();
 
   // 프로필 정보
-  late final ImageProvider _defaultImage;
-  late String _userName;
+  ImageProvider? _defaultImage;
+  String? _userName;
 
   // 프로필 정보 - 이미지 업로드
   File? _selectedImage;
@@ -24,29 +28,48 @@ class _MyPageState extends State<MyPage> {
   @override
   void initState() {
     super.initState();
-    // 데이터에서 프로필 정보 초기화
-    _defaultImage = AssetImage(myPageDataList['profile']['profileImageUrl']);
-    _userName = myPageDataList['profile']['name'];
+    final memberId = int.parse(userController.userId.value);
+    myPageController = Get.put(MyPageController(memberId));
+
+    // 데이터 로딩 후 상태 업데이트
+    myPageController.profileData.listen((profileData) {
+      if (profileData != null && profileData.isNotEmpty) {
+        final profileImageUrl = profileData['profileImageUrl'] as String?;
+        final name = profileData['name'] as String?;
+
+        setState(() {
+          _defaultImage = profileImageUrl != null
+              ? NetworkImage(profileImageUrl)
+              : AssetImage('assets/default_profile.png');
+          _userName = name ?? '이름 없음';
+        });
+      } else {
+        setState(() {
+          _defaultImage = AssetImage('assets/default_profile.png');
+          _userName = '이름 없음';
+        });
+      }
+    });
+
+    // 데이터 로드 호출
+    myPageController.fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double barWidth = screenWidth / 3; // 3개의 탭 중 선택된 탭의 위치에 맞게 조정
-    double barPosition = barWidth * controller.selectedIndex;
-    int adjustedIndex = (controller.selectedIndex) % 3;
+    double barPosition = barWidth * tabController.selectedIndex;
+    int adjustedIndex = tabController.selectedIndex % 3;
 
     // 현재 선택된 탭의 데이터
     List<Map<String, dynamic>> currentTabData;
     if (adjustedIndex == 0) {
-      currentTabData =
-          List<Map<String, dynamic>>.from(myPageDataList['scraps']);
+      currentTabData = myPageController.reviews; // 내 리뷰
     } else if (adjustedIndex == 1) {
-      currentTabData =
-          List<Map<String, dynamic>>.from(myPageDataList['reviews']);
+      currentTabData = myPageController.communities; // 내 운동
     } else {
-      currentTabData =
-          List<Map<String, dynamic>>.from(myPageDataList['communities']);
+      currentTabData = myPageController.scraps; // 스크랩
     }
 
     return Scaffold(
@@ -69,19 +92,25 @@ class _MyPageState extends State<MyPage> {
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: GestureDetector(
-                      onTap: () {
-                        _showProfileModal();
-                      },
+                      onTap: _showProfileModal,
                       child: Container(
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: _defaultImage,
-                            fit: BoxFit.cover,
-                          ),
+                          image: _defaultImage != null
+                              ? DecorationImage(
+                                  image: _defaultImage!,
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                         ),
+                        child: _defaultImage == null
+                            ? Center(
+                                child: Icon(Icons.person,
+                                    size: 50, color: Colors.grey),
+                              )
+                            : null,
                       ),
                     ),
                   ),
@@ -91,7 +120,7 @@ class _MyPageState extends State<MyPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _userName,
+                          _userName ?? '이름 없음',
                           style: TextStyle(
                             fontSize: 25,
                           ),
@@ -132,26 +161,34 @@ class _MyPageState extends State<MyPage> {
               ),
             ),
             // 이미지 그리드
-            GridView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 1,
-              ),
-              itemCount: currentTabData.length,
-              itemBuilder: (context, index) {
-                String imageUrl = currentTabData[index]['imageUrl'];
+            Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 1,
+                ),
+                itemCount: currentTabData.length,
+                itemBuilder: (context, index) {
+                  final imageUrl = currentTabData[index]['imageUrl'] ?? '';
 
-                return Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(imageUrl),
-                      fit: BoxFit.cover,
+                  return Container(
+                    decoration: BoxDecoration(
+                      image: imageUrl.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(imageUrl),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                     ),
-                  ),
-                );
-              },
+                    child: imageUrl.isEmpty
+                        ? Center(child: Icon(Icons.image_not_supported))
+                        : null,
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -161,12 +198,12 @@ class _MyPageState extends State<MyPage> {
 
   Widget _buildTab(String title, int index) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double tabWidth = screenWidth / 3; // 3개의 탭에 맞춰 조정
+    double tabWidth = screenWidth / 3;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          controller.setSelectedIndex(index);
+          tabController.setSelectedIndex(index);
         });
       },
       child: MouseRegion(
@@ -179,7 +216,7 @@ class _MyPageState extends State<MyPage> {
             title,
             style: TextStyle(
               fontSize: 20,
-              fontWeight: controller.selectedIndex == index
+              fontWeight: tabController.selectedIndex == index
                   ? FontWeight.bold
                   : FontWeight.normal,
             ),
@@ -195,13 +232,16 @@ class _MyPageState extends State<MyPage> {
       isScrollControlled: true,
       builder: (context) {
         return MyPageModal(
+          profileImageUrl: _defaultImage is NetworkImage
+              ? (_defaultImage as NetworkImage).url
+              : null,
           selectedImage: _selectedImage,
           onImageChanged: (image) {
             setState(() {
               _selectedImage = image;
             });
           },
-          userName: _userName,
+          userName: _userName ?? '', // 기본값을 빈 문자열로 설정
           onUserNameChanged: (name) {
             setState(() {
               _userName = name;

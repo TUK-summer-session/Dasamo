@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MyPageModal extends StatefulWidget {
+  final String? profileImageUrl; // URL을 추가
   final File? selectedImage;
   final ValueChanged<File?> onImageChanged;
   final String userName;
@@ -10,6 +11,7 @@ class MyPageModal extends StatefulWidget {
 
   const MyPageModal({
     Key? key,
+    this.profileImageUrl, // 추가된 URL
     this.selectedImage,
     required this.onImageChanged,
     required this.userName,
@@ -22,26 +24,24 @@ class MyPageModal extends StatefulWidget {
 
 class _MyPageModalState extends State<MyPageModal> {
   File? _image;
-  late String _name;
+  late TextEditingController _nameController;
 
   @override
   void initState() {
     super.initState();
     _image = widget.selectedImage;
-    _name = widget.userName;
+    _nameController = TextEditingController(text: widget.userName);
   }
 
   @override
   void dispose() {
-    // 모달이 닫힐 때 이미지를 기본 이미지로 리셋
-    widget.onImageChanged(null);
+    _nameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -58,59 +58,35 @@ class _MyPageModalState extends State<MyPageModal> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               image: DecorationImage(
-                image: _image == null
-                    ? AssetImage('assets/images/profile.jpg')
-                    : FileImage(_image!) as ImageProvider,
+                image: _image != null
+                    ? FileImage(_image!)
+                    : widget.profileImageUrl != null
+                        ? NetworkImage(widget.profileImageUrl!)
+                        : AssetImage('assets/images/default_profile.svg')
+                            as ImageProvider,
                 fit: BoxFit.cover,
               ),
             ),
+            child: _image == null && widget.profileImageUrl == null
+                ? Center(
+                    child: Icon(Icons.person, size: 50, color: Colors.grey),
+                  )
+                : null,
           ),
           SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.photo_library),
-                    onPressed: () async {
-                      final picker = ImagePicker();
-                      final pickedFile =
-                          await picker.pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setState(() {
-                          _image = File(pickedFile.path);
-                          widget.onImageChanged(_image);
-                        });
-                      }
-                    },
-                  ),
-                  SizedBox(height: 4),
-                  Text('이미지 선택'),
-                ],
+              _buildImageOption(
+                icon: Icons.photo_library,
+                label: '이미지 선택',
+                source: ImageSource.gallery,
               ),
               SizedBox(width: 32),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.camera_alt),
-                    onPressed: () async {
-                      final picker = ImagePicker();
-                      final pickedFile =
-                          await picker.pickImage(source: ImageSource.camera);
-                      if (pickedFile != null) {
-                        setState(() {
-                          _image = File(pickedFile.path);
-                          widget.onImageChanged(_image);
-                        });
-                      }
-                    },
-                  ),
-                  SizedBox(height: 4),
-                  Text('사진 찍기'),
-                ],
+              _buildImageOption(
+                icon: Icons.camera_alt,
+                label: '사진 찍기',
+                source: ImageSource.camera,
               ),
             ],
           ),
@@ -128,15 +104,12 @@ class _MyPageModalState extends State<MyPageModal> {
               ),
               Expanded(
                 child: TextField(
-                  controller: TextEditingController(text: _name),
+                  controller: _nameController,
                   onChanged: (value) {
-                    setState(() {
-                      _name = value;
-                      widget.onUserNameChanged(_name);
-                    });
+                    widget.onUserNameChanged(value);
                   },
                   decoration: InputDecoration(
-                    border: InputBorder.none, // 테두리 없음
+                    border: InputBorder.none,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   ),
@@ -147,12 +120,39 @@ class _MyPageModalState extends State<MyPageModal> {
           SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop(); // 모달 창 닫기
+              Navigator.of(context).pop();
             },
             child: Text('저장'),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildImageOption({
+    required IconData icon,
+    required String label,
+    required ImageSource source,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: Icon(icon),
+          onPressed: () async {
+            final picker = ImagePicker();
+            final pickedFile = await picker.pickImage(source: source);
+            if (pickedFile != null) {
+              setState(() {
+                _image = File(pickedFile.path);
+                widget.onImageChanged(_image);
+              });
+            }
+          },
+        ),
+        SizedBox(height: 4),
+        Text(label),
+      ],
     );
   }
 }
