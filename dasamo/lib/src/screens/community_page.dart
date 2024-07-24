@@ -1,3 +1,4 @@
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/community_controller.dart';
@@ -14,18 +15,21 @@ class _CommunityPageState extends State<CommunityPage> {
   final CommunityController communityController =
       Get.put(CommunityController());
   bool _favoriteHovered = false;
+  final UserController userController = Get.put(UserController());
 
   @override
   void initState() {
     super.initState();
     // 데이터 초기 로드 (memberId를 적절히 설정)
-    final int memberId = 1; // 실제 memberId를 이곳에 설정합니다.
+    final memberId =
+        int.parse(userController.userId.value); // 실제 memberId를 이곳에 설정합니다.
     communityController.fetchCommunities(memberId);
   }
 
   Future<void> _toggleLike(Map<String, dynamic> community) async {
     final int communityId = community['communityId'];
-    final int memberId = 1; // 실제 memberId를 이곳에 설정합니다.
+    final memberId =
+        int.parse(userController.userId.value); // 실제 memberId를 이곳에 설정합니다.
 
     try {
       if (community['isLiked']) {
@@ -70,7 +74,6 @@ class _CommunityPageState extends State<CommunityPage> {
         leading: SizedBox.shrink(),
         leadingWidth: 0,
         title: const Text('커뮤니티'),
-
       ),
       body: Obx(() {
         if (communityController.communityList.isEmpty) {
@@ -194,7 +197,7 @@ class _CommunityPageState extends State<CommunityPage> {
                               ),
                             ),
                             SizedBox(width: 5),
-                            CommunityCommentIcon(),
+                            CommunityCommentIcon(communityId: communityId),
                           ],
                         ),
                       ],

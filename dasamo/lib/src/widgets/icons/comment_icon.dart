@@ -23,7 +23,7 @@ class _CommentIconState extends State<CommentIcon> {
         });
       },
       onTap: () {
-        print('Review ID: ${widget.reviewId}');
+        print('Review ID???????: ${widget.reviewId}');
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -62,6 +62,7 @@ class _CommentIconState extends State<CommentIcon> {
                       onSave: (comment) {
                         print('저장된 댓글: $comment');
                       },
+                      reviewId: widget.reviewId,
                     ),
                   ),
                 ],

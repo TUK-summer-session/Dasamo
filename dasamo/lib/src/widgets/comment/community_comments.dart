@@ -1,4 +1,5 @@
 import 'package:dasamo/src/controllers/community_comments_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,6 +13,7 @@ class CommunityComments extends StatelessWidget {
   Widget build(BuildContext context) {
     final CommunityCommentsController communityCommentsController =
         Get.put(CommunityCommentsController(communityId));
+    final UserController userController = Get.put(UserController());
 
     return Obx(() {
       if (communityCommentsController.communityCommentsList.isEmpty) {
@@ -26,8 +28,7 @@ class CommunityComments extends StatelessWidget {
           final comment =
               communityCommentsController.communityCommentsList[index];
 
-          final commentId = comment['commentId'] as int?;
-          final memberId = comment['memberId'] as int?;
+          final memberId = int.parse(userController.userId.value);
 
           return ListTile(
             title: Text(comment['name']),
@@ -36,16 +37,10 @@ class CommunityComments extends StatelessWidget {
               backgroundImage: NetworkImage(comment['profileImageUrl']),
             ),
             // member id가 1이면
-            trailing: comment['memberId'] == 1
+            trailing: comment['memberId'] == memberId
                 ? IconButton(
                     icon: Icon(Icons.close, color: Colors.red),
                     onPressed: () async {
-                      if (commentId == null || memberId == null) {
-                        // 댓글 ID 또는 멤버 ID가 null인 경우
-                        print(
-                            'Invalid comment ID or member ID: commentId=$commentId, memberId=$memberId');
-                        return;
-                      }
                       // 삭제 버튼 클릭 시 수행할 작업
                       bool? confirmed = await showDialog(
                         context: context,

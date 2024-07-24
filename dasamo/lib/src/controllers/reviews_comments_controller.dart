@@ -11,13 +11,16 @@ class ReviewsCommentsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('ReviewsCommentsController initialized with reviewId: $reviewId');
     fetchComments();
   }
 
   // 리뷰 댓글 조회
   Future<void> fetchComments() async {
     final url =
-        Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$reviewId'); //
+        Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$reviewId');
+
+    print('Fetching comments for reviewId: $reviewId');
 
     try {
       final response = await http.get(url);

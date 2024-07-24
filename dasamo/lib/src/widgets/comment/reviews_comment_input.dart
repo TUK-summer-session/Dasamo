@@ -5,8 +5,10 @@ import 'package:get/get.dart';
 
 class ReviewsCommentInput extends StatefulWidget {
   final Function(String) onSave;
+  final int reviewId;
 
-  const ReviewsCommentInput({Key? key, required this.onSave}) : super(key: key);
+  const ReviewsCommentInput(
+      {required this.reviewId, required this.onSave, super.key});
 
   @override
   _ReviewsCommentInputState createState() => _ReviewsCommentInputState();
@@ -20,8 +22,13 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
   @override
   void initState() {
     super.initState();
-    _reviewsCommentsController =
-        Get.put(ReviewsCommentsController(1)); // 리뷰 ID를 1로 설정
+    print(
+        "Initialized ReviewsCommentsController with reviewId: ${widget.reviewId}");
+
+    // 컨트롤러 초기화
+    _reviewsCommentsController = Get.put(
+        ReviewsCommentsController(widget.reviewId),
+        tag: widget.reviewId.toString());
   }
 
   @override
@@ -33,7 +40,7 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
   @override
   Widget build(BuildContext context) {
     final memberId = int.parse(userController.userId.value);
-    final reviewId = _reviewsCommentsController.reviewId;
+    print('Review ID!!!!: ${widget.reviewId}');
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -61,9 +68,6 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
                 ),
                 maxLines: 3, // 최대 줄 수
                 minLines: 1, // 최소 줄 수
-                onChanged: (text) {
-                  // 입력된 텍스트를 상태로 관리하거나 필요한 경우 처리
-                },
               ),
             ),
             SizedBox(width: 8), // 아이콘과 TextField 사이 간격 조정
@@ -73,8 +77,6 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
                 String comment = _textEditingController.text;
                 if (comment.isNotEmpty) {
                   print('Posting comment:');
-                  print('Review ID: $reviewId');
-                  print('Member ID: $memberId');
                   await _reviewsCommentsController.postComment(
                       memberId, comment); // 댓글을 POST합니다.
                   _textEditingController.clear(); // 입력창 초기화

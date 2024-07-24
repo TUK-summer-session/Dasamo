@@ -4,14 +4,22 @@ import 'package:dasamo/src/screens/community_page.dart';
 import 'package:dasamo/src/screens/my_page.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final int initialIndex;
+
+  const Home({super.key, this.initialIndex = 0});
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex; // 초기 탭 인덱스를 설정
+  }
 
   final List<BottomNavigationBarItem> myTabs = [
     const BottomNavigationBarItem(

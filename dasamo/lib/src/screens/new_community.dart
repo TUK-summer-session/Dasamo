@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:dasamo/src/home.dart';
 import 'package:dasamo/src/screens/review/index.dart';
 import 'package:dasamo/src/shared/review/tag_data.dart';
@@ -24,6 +25,7 @@ class _NewCommunityState extends State<NewCommunity> {
   final TextEditingController _contentController = TextEditingController();
   final CommunityController _communityController =
       Get.put(CommunityController());
+  final UserController userController = Get.put(UserController());
 
   File? _image;
   final ImagePicker _picker = ImagePicker();
@@ -57,6 +59,7 @@ class _NewCommunityState extends State<NewCommunity> {
   }
 
   void _submitCommunityPost() async {
+    final memberId = int.parse(userController.userId.value);
     if (_contentController.text.isEmpty) {
       // 내용이 없을 때 처리
       print('내용을 입력하세요');
@@ -64,13 +67,12 @@ class _NewCommunityState extends State<NewCommunity> {
     }
 
     await _communityController.submitFeed(
-      memberId: 1, // 실제 멤버 ID로 변경하세요
+      memberId: memberId, // 실제 멤버 ID로 변경하세요
       detail: _contentController.text,
       imageFile: _image,
     );
 
-    // 성공적으로 제출된 경우, 홈 화면으로 이동
-    Get.to(CommunityPage());
+    Get.to(Home(initialIndex: 1));
   }
 
   @override

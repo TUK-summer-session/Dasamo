@@ -76,9 +76,12 @@ class CommunityController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(responseBody.body);
+        final communityId = responseData['communityId'];
+
         print('Feed submitted successfully: ${responseData['message']}');
         // 피드 제출 후 피드 목록을 갱신합니다.
         await fetchCommunities(memberId); // 피드 목록을 다시 불러옵니다.
+        return communityId;
       } else {
         print('Failed to submit feed: ${responseBody.body}');
       }

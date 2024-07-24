@@ -1,11 +1,14 @@
 import 'package:dasamo/src/controllers/community_comments_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CommunityCommentInput extends StatefulWidget {
   final Function(String) onSave;
+  final int communityId;
 
-  const CommunityCommentInput({Key? key, required this.onSave})
+  const CommunityCommentInput(
+      {Key? key, required this.communityId, required this.onSave})
       : super(key: key);
 
   @override
@@ -15,12 +18,13 @@ class CommunityCommentInput extends StatefulWidget {
 class _CommunityCommentInputState extends State<CommunityCommentInput> {
   TextEditingController _textEditingController = TextEditingController();
   late CommunityCommentsController _communityCommentsController;
+  final UserController userController = Get.put(UserController());
 
   @override
   void initState() {
     super.initState();
-    _communityCommentsController =
-        Get.put(CommunityCommentsController(1)); // 커뮤니티 ID를 1로 설정
+    _communityCommentsController = Get.put(
+        CommunityCommentsController(widget.communityId)); // 커뮤니티 ID를 1로 설정
   }
 
   @override
@@ -31,6 +35,8 @@ class _CommunityCommentInputState extends State<CommunityCommentInput> {
 
   @override
   Widget build(BuildContext context) {
+    final memberId = int.parse(userController.userId.value);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
@@ -68,8 +74,8 @@ class _CommunityCommentInputState extends State<CommunityCommentInput> {
               onPressed: () async {
                 String comment = _textEditingController.text;
                 if (comment.isNotEmpty) {
-                  await _communityCommentsController
-                      .postComment(comment); // 댓글을 POST합니다.
+                  await _communityCommentsController.postComment(
+                      memberId, comment); // 댓글을 POST합니다.
                   _textEditingController.clear(); // 입력창 초기화
                 }
               },
