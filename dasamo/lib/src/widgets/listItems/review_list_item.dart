@@ -1,4 +1,3 @@
-import 'package:dasamo/src/screens/review/show.dart';
 import 'package:flutter/material.dart';
 import 'package:dasamo/src/widgets/buttons/tags/review_tag_button.dart';
 import 'package:get/get.dart';
@@ -11,11 +10,12 @@ class ReviewListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> tagList = List<String>.from(item['tagKind']); // 태그 리스트 생성
+    List<String> tagList = List<String>.from(item['tagKind']);
 
     return InkWell(
       onTap: () {
-        Get.toNamed('/review/${item['id']}'); // reviewId로 라우팅
+        print("item id: ${item['id']}");
+        Get.toNamed('/review/${item['id']}');
       },
       child: Stack(
         children: [
