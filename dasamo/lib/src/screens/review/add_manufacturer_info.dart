@@ -91,12 +91,6 @@ class _AddManufacturerInfoState extends State<AddManufacturerInfo> {
   AppBar _buildAppBar() {
     return AppBar(
       centerTitle: false,
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new_rounded),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
       title: Text('리뷰 등록하기'),
     );
   }

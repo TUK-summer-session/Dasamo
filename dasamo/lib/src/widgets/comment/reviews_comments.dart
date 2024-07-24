@@ -6,7 +6,7 @@ import 'package:dasamo/src/controllers/review/reviews_comments_controller.dart';
 class ReviewsComments extends StatelessWidget {
   final int reviewId;
 
-  const ReviewsComments({required this.reviewId, Key? key}) : super(key: key);
+  const ReviewsComments({required this.reviewId, super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -6,8 +6,7 @@ import 'package:get/get.dart';
 class CommunityComments extends StatelessWidget {
   final int communityId;
 
-  const CommunityComments({required this.communityId, Key? key})
-      : super(key: key);
+  const CommunityComments({required this.communityId, super.key});
 
   @override
   Widget build(BuildContext context) {
