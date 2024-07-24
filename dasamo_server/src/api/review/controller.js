@@ -303,18 +303,6 @@ exports.getQuestions = async (req, res) => {
     console.error("Query error:", error);
     res.status(500).send(createResponse(500, "서버 오류"));
   }
-  try {
-    const questions = await repository.getQuestionAllByReviewId(reviewId);
-    const response = createResponse(
-      200,
-      "리뷰 댓글이 성공적으로 조회되었습니다.",
-      { questions }
-    );
-    res.send(response);
-  } catch (error) {
-    console.error("Query error:", error);
-    res.status(500).send(createResponse(500, "서버 오류"));
-  }
 };
 
 exports.storeQuestion = async (req, res) => {

@@ -59,19 +59,25 @@ class ReviewsCommentsController extends GetxController {
   }
 
   // 리뷰 댓글 저장
-  Future<void> postComment(String comment) async {
+  Future<void> postComment(int memberId, String comment) async {
     final url =
         Uri.parse('http://10.0.2.2:3000/api/reviews/questions/$reviewId');
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode({
-      "memberId": 1,
+      "memberId": memberId,
       "isQuestionForQuestion": 0, // false
       "parentQuestion": null,
       "detail": comment
     });
 
+    print('Posting comment to: $url');
+    print('Request body: $body');
+
     try {
       final response = await http.post(url, headers: headers, body: body);
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         print('Comment posted successfully');

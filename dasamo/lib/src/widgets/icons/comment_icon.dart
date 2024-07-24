@@ -3,7 +3,9 @@ import 'package:dasamo/src/widgets/comment/reviews_comments.dart';
 import 'package:flutter/material.dart';
 
 class CommentIcon extends StatefulWidget {
-  const CommentIcon({Key? key}) : super(key: key);
+  final int reviewId;
+
+  const CommentIcon({required this.reviewId});
 
   @override
   _CommentIconState createState() => _CommentIconState();
@@ -21,6 +23,7 @@ class _CommentIconState extends State<CommentIcon> {
         });
       },
       onTap: () {
+        print('Review ID: ${widget.reviewId}');
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -50,7 +53,7 @@ class _CommentIconState extends State<CommentIcon> {
                   ),
                   Expanded(
                     child: ReviewsComments(
-                      reviewId: 1,
+                      reviewId: widget.reviewId,
                     ),
                   ),
                   Padding(
