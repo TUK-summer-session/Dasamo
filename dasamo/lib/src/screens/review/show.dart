@@ -11,6 +11,7 @@ import 'package:dasamo/src/widgets/listItems/goods_list_item.dart';
 import 'package:dasamo/src/widgets/show/show_review_content.dart';
 import 'package:dasamo/src/widgets/user/writer_info.dart';
 import 'package:dasamo/src/widgets/modal/review_action_sheet.dart';
+import 'package:dasamo/src/controllers/mypage_controller.dart';
 
 class ReviewShow extends StatefulWidget {
   final int reviewId;
@@ -39,6 +40,7 @@ class _ReviewShowState extends State<ReviewShow> {
   Future<void> toggleBookMark(bool isBookmarked) async {
     final ReviewController reviewController = Get.put(ReviewController());
     final UserController userController = Get.put(UserController());
+    final MyPageController myPageController = Get.find<MyPageController>();
 
     final memberId = int.parse(userController.userId.value);
 
@@ -54,6 +56,9 @@ class _ReviewShowState extends State<ReviewShow> {
       setState(() {
         _reviewData = fetchReviewData(widget.reviewId);
       });
+
+      // Refresh the MyPageController data
+      myPageController.fetchData();
     } catch (e) {
       Get.snackbar('오류', '북마크 상태를 변경할 수 없습니다.');
     }
@@ -63,6 +68,7 @@ class _ReviewShowState extends State<ReviewShow> {
     final ReviewController reviewController = Get.put(ReviewController());
     final UserController userController = Get.put(UserController());
     final memberId = int.parse(userController.userId.value);
+    print("like User ID: $memberId");
 
     try {
       if (isLiked) {
