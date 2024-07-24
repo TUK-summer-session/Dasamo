@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class CommunityCommentIcon extends StatefulWidget {
   final int communityId;
 
-  const CommunityCommentIcon({required this.communityId});
+  const CommunityCommentIcon({super.key, required this.communityId});
 
   @override
   _CommunityCommentIconState createState() => _CommunityCommentIconState();
