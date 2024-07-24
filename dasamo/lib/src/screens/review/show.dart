@@ -62,7 +62,6 @@ class _ReviewShowState extends State<ReviewShow> {
     final ReviewController reviewController = Get.put(ReviewController());
     final UserController userController = Get.put(UserController());
     final memberId = int.parse(userController.userId.value);
-    print("like User ID: $memberId");
 
     try {
       if (isLiked) {

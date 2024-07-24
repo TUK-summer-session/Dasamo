@@ -5,6 +5,7 @@ import 'package:dasamo/src/controllers/mypage_controller.dart';
 import 'package:dasamo/src/controllers/user/user_controller.dart';
 import 'package:dasamo/src/widgets/modal/mypage_modal.dart';
 import 'package:dasamo/src/controllers/my_page_tab_controller.dart';
+import 'package:dasamo/src/screens/review/show.dart'; // 파일 경로 확인
 
 class MyPage extends StatefulWidget {
   const MyPage({Key? key}) : super(key: key);
@@ -61,16 +62,6 @@ class _MyPageState extends State<MyPage> {
     double barWidth = screenWidth / 3; // 3개의 탭 중 선택된 탭의 위치에 맞게 조정
     double barPosition = barWidth * tabController.selectedIndex;
     int adjustedIndex = tabController.selectedIndex % 3;
-
-    // 현재 선택된 탭의 데이터
-    List<Map<String, dynamic>> currentTabData;
-    if (adjustedIndex == 0) {
-      currentTabData = myPageController.reviews; // 내 리뷰
-    } else if (adjustedIndex == 1) {
-      currentTabData = myPageController.communities; // 내 운동
-    } else {
-      currentTabData = myPageController.scraps; // 스크랩
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -163,29 +154,58 @@ class _MyPageState extends State<MyPage> {
             // 이미지 그리드
             Container(
               height: MediaQuery.of(context).size.height * 0.6,
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 1,
-                ),
-                itemCount: currentTabData.length,
-                itemBuilder: (context, index) {
-                  final imageUrl = currentTabData[index]['imageUrl'] ?? '';
+              child: Obx(
+                () {
+                  List<Map<String, dynamic>> currentTabData;
+                  if (adjustedIndex == 0) {
+                    currentTabData = myPageController.reviews; // 내 리뷰
+                  } else if (adjustedIndex == 1) {
+                    currentTabData = myPageController.communities; // 내 운동
+                  } else {
+                    currentTabData = myPageController.scraps; // 스크랩
+                  }
 
-                  return Container(
-                    decoration: BoxDecoration(
-                      image: imageUrl.isNotEmpty
-                          ? DecorationImage(
-                              image: NetworkImage(imageUrl),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 1,
                     ),
-                    child: imageUrl.isEmpty
-                        ? Center(child: Icon(Icons.image_not_supported))
-                        : null,
+                    itemCount: currentTabData.length,
+                    itemBuilder: (context, index) {
+                      final imageUrl = currentTabData[index]['imageUrl'] ?? '';
+                      final reviewId = currentTabData[index]['reviewId'];
+
+                      return GestureDetector(
+                        onTap: () {
+                          print('Image tapped with reviewId: $reviewId');
+                          if (reviewId != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ReviewShow(reviewId: reviewId),
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: imageUrl.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(imageUrl),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                            color: Colors.grey[200], // 이미지가 없을 경우 배경색
+                          ),
+                          child: imageUrl.isEmpty
+                              ? Center(child: Icon(Icons.image_not_supported))
+                              : null,
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -247,6 +267,7 @@ class _MyPageState extends State<MyPage> {
               _userName = name;
             });
           },
+          reviews: myPageController.reviews, // 리뷰 리스트 전달
         );
       },
     );
