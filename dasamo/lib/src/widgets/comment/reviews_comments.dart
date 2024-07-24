@@ -12,6 +12,7 @@ class ReviewsComments extends StatelessWidget {
   Widget build(BuildContext context) {
     final ReviewsCommentsController commentsController =
         Get.put(ReviewsCommentsController(reviewId));
+    final UserController userController = Get.put(UserController());
 
     final UserController _userController = Get.put(UserController());
 
@@ -26,6 +27,7 @@ class ReviewsComments extends StatelessWidget {
         itemCount: commentsController.commentsList.length,
         itemBuilder: (context, index) {
           final comment = commentsController.commentsList[index];
+          final memberId = int.parse(userController.userId.value);
 
           return ListTile(
             title: Text(

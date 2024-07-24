@@ -8,6 +8,8 @@ class CommentIcon extends StatefulWidget {
   final int reviewId;
   const CommentIcon({super.key, required this.reviewId});
 
+  const CommentIcon({required this.reviewId});
+
   @override
   _CommentIconState createState() => _CommentIconState();
 }

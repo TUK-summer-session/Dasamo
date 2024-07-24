@@ -142,7 +142,7 @@ class _NewReviewState extends State<NewReview> {
           tagIds: _selectedTags,
           imageFile: _image,
         );
-        Get.to(Home()); // 리뷰 제출 후 홈으로 돌아가기
+        Get.to(Home(initialIndex: 0)); // 리뷰 제출 후 홈으로 돌아가기
       } catch (e) {
         print('리뷰 제출 실패: $e');
         ScaffoldMessenger.of(context).showSnackBar(
