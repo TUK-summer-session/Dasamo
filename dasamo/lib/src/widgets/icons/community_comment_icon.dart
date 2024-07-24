@@ -1,6 +1,8 @@
+import 'package:dasamo/src/controllers/community_comments_controller.dart';
 import 'package:dasamo/src/widgets/comment/community_comment_input.dart';
 import 'package:dasamo/src/widgets/comment/community_comments.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CommunityCommentIcon extends StatefulWidget {
   final int communityId;
@@ -13,6 +15,15 @@ class CommunityCommentIcon extends StatefulWidget {
 
 class _CommunityCommentIconState extends State<CommunityCommentIcon> {
   bool _hovered = false;
+
+  @override
+  void initState() {
+    final CommunityCommentsController _communityCommentsController =
+        Get.put(CommunityCommentsController(widget.communityId));
+    // TODO: implement initState
+    super.initState();
+    _communityCommentsController.fetchComments();
+  }
 
   @override
   Widget build(BuildContext context) {
