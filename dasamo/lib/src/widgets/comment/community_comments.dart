@@ -36,7 +36,6 @@ class CommunityComments extends StatelessWidget {
             leading: CircleAvatar(
               backgroundImage: NetworkImage(comment['profileImageUrl']),
             ),
-            // member id가 1이면
             trailing: comment['memberId'] == memberId
                 ? IconButton(
                     icon: Icon(Icons.close, color: Colors.red),

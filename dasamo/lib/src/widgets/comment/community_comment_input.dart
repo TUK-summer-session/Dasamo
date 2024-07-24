@@ -18,13 +18,15 @@ class CommunityCommentInput extends StatefulWidget {
 class _CommunityCommentInputState extends State<CommunityCommentInput> {
   TextEditingController _textEditingController = TextEditingController();
   late CommunityCommentsController _communityCommentsController;
-  final UserController userController = Get.put(UserController());
+  final UserController userController =
+      Get.find<UserController>(); // Get.find()로 수정
 
   @override
   void initState() {
     super.initState();
     _communityCommentsController = Get.put(
-        CommunityCommentsController(widget.communityId)); // 커뮤니티 ID를 1로 설정
+        CommunityCommentsController(widget.communityId),
+        tag: widget.communityId.toString()); // 커뮤니티 ID를 초기화
   }
 
   @override
@@ -36,6 +38,7 @@ class _CommunityCommentInputState extends State<CommunityCommentInput> {
   @override
   Widget build(BuildContext context) {
     final memberId = int.parse(userController.userId.value);
+    final profileImageUrl = userController.profileImageUrl.value;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -48,7 +51,9 @@ class _CommunityCommentInputState extends State<CommunityCommentInput> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: AssetImage('assets/images/profile.jpg'), // 로컬 이미지
+                  image: NetworkImage(
+                      profileImageUrl), // 유저의 프로필 이미지를 네트워크에서 가져옵니다.
+
                   fit: BoxFit.cover, // 이미지를 컨테이너 크기에 맞춤
                 ),
               ),
