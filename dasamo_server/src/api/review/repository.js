@@ -87,11 +87,12 @@ const getQuestionAllByReviewId = async (reviewId) => {
     return questions;
 };
 
-const storeQuestions = async (createDTO) => {
+const storeQuestions = async ({ memberId, reviewId, isQuestionForQuestion, parentQuestion, detail }) => {
     const result = await db.query(
         'INSERT INTO Question (memberId, reviewId, isQuestionForQuestion, parentQuestion, detail, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
-        [createDTO.memberId, createDTO.reviewId, createDTO.isQuestionForQuestion, createDTO.parentQuestion, createDTO.detail]
+        [memberId, reviewId, isQuestionForQuestion, parentQuestion, detail]
     );
+    return result;
 }
 
 

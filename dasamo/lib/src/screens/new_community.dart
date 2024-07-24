@@ -77,7 +77,7 @@ class _NewCommunityState extends State<NewCommunity> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('커뮤니티 등록하기'),
+        title: Text('글 작성하기'),
       ),
       body: Column(
         children: [

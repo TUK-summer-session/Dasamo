@@ -27,6 +27,7 @@ class _ReviewShowState extends State<ReviewShow> {
   void initState() {
     super.initState();
     _reviewData = fetchReviewData(widget.reviewId);
+    print(widget.reviewId);
   }
 
   Future<Map<String, dynamic>> fetchReviewData(int reviewId) async {
@@ -191,28 +192,35 @@ class _ReviewShowState extends State<ReviewShow> {
                         },
                       ),
                       SizedBox(width: 5),
-                      CommentIcon(),
+                      CommentIcon(reviewId: widget.reviewId),
                       SizedBox(width: 5),
-                      BookmarkIcon(
-                        isBookmarked: isBookmarked,
-                        onTap: (isBookmarked) {
-                          toggleBookMark(isBookmarked);
-                        },
-                      ),
                     ],
                   ),
-                  Row(
-                    children: List.generate(tags.length, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: ReviewTagButton(title: tags[index]),
-                      );
-                    }),
-                  ),
+                  Row(children: [
+                    BookmarkIcon(
+                      isBookmarked: isBookmarked,
+                      onTap: (isBookmarked) {
+                        toggleBookMark(isBookmarked);
+                      },
+                    ),
+                  ]),
                 ],
               ),
             ),
             GoodsListItem(item: product),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, top: 10),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(tags.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: ReviewTagButton(title: tags[index]),
+                  );
+                }),
+              ),
+            ),
             ShowReviewContent(item: reviewDetail),
           ],
         );

@@ -1,9 +1,9 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dasamo/src/providers/goods_provider.dart';
 import 'package:get/get.dart';
 
 class GoodsController extends GetxController {
-  RxList<Map> goodsList = <Map>[].obs;
+  RxList<Map<String, dynamic>> goodsList = <Map<String, dynamic>>[].obs;
+  final GoodsProvider _goodsProvider = GoodsProvider(); // Create an instance of the provider
 
   @override
   void onInit() {
@@ -12,22 +12,9 @@ class GoodsController extends GetxController {
   }
 
   Future<void> fetchGoodsData() async {
-    final url = 'http://10.0.2.2:3000/api/reviews/products';
     try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final List<dynamic> data =
-            json.decode(response.body)['data']['products'];
-        goodsList.assignAll(data
-            .map((item) => {
-                  'productId': item['productId'],
-                  'brand': item['brand'],
-                  'name': item['name'],
-                })
-            .toList());
-      } else {
-        print('Failed to load data');
-      }
+      final data = await _goodsProvider.fetchGoodsData();
+      goodsList.assignAll(data);
     } catch (error) {
       print('Error fetching data: $error');
     }

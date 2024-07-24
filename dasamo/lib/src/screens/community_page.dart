@@ -4,6 +4,7 @@ import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:dasamo/src/screens/new_community.dart';
 import 'package:dasamo/src/widgets/expand/expand_text.dart';
 import 'package:dasamo/src/widgets/icons/community_comment_icon.dart';
+import 'package:intl/intl.dart';
 
 class CommunityPage extends StatefulWidget {
   @override
@@ -86,6 +87,8 @@ class _CommunityPageState extends State<CommunityPage> {
               final int communityId = community['communityId'];
               final member = community['member'];
               final image = community['image'];
+              final DateTime parsedDate = DateTime.parse(community['createdAt']);
+              final String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
 
               if (member == null) {
                 return SizedBox.shrink();
@@ -96,7 +99,7 @@ class _CommunityPageState extends State<CommunityPage> {
                 children: [
                   // 프로필
                   Container(
-                    padding: EdgeInsets.all(20.0),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -104,8 +107,8 @@ class _CommunityPageState extends State<CommunityPage> {
                         Row(
                           children: <Widget>[
                             Container(
-                              width: 70,
-                              height: 70,
+                              width: 32,
+                              height: 32,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
@@ -116,21 +119,21 @@ class _CommunityPageState extends State<CommunityPage> {
                               ),
                             ),
                             Container(
-                              padding: EdgeInsets.only(left: 20),
+                              padding: EdgeInsets.only(left: 10),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     member['name'] ?? '',
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                     ),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    community['createdAt'] ?? '',
+                                    formattedDate ?? '',
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: 14,
                                       color: Colors.grey,
                                     ),
                                   ),

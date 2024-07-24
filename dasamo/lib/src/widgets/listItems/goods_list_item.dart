@@ -28,7 +28,7 @@ class _GoodsListItemState extends State<GoodsListItem> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey.shade100, // 원하는 배경 색상 설정

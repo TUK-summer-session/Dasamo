@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:dasamo/src/controllers/review/reviews_comments_controller.dart';
 import 'package:dasamo/src/widgets/comment/reviews_comment_input.dart';
 import 'package:dasamo/src/widgets/comment/reviews_comments.dart';
-import 'package:flutter/material.dart';
 
 class CommentIcon extends StatefulWidget {
-  const CommentIcon({Key? key}) : super(key: key);
+  final int reviewId;
+  const CommentIcon({super.key, required this.reviewId});
 
   @override
   _CommentIconState createState() => _CommentIconState();
@@ -11,6 +14,13 @@ class CommentIcon extends StatefulWidget {
 
 class _CommentIconState extends State<CommentIcon> {
   bool _hovered = false;
+  late ReviewsCommentsController _reviewsCommentsController;
+
+  @override
+  void initState() {
+    super.initState();
+    _reviewsCommentsController = Get.put(ReviewsCommentsController(widget.reviewId));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +31,9 @@ class _CommentIconState extends State<CommentIcon> {
         });
       },
       onTap: () {
+        // Ensure that the controller is updated before showing the bottom sheet
+        _reviewsCommentsController.updateReviewId(widget.reviewId);
+        
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -50,16 +63,14 @@ class _CommentIconState extends State<CommentIcon> {
                   ),
                   Expanded(
                     child: ReviewsComments(
-                      reviewId: 1,
+                      reviewId: widget.reviewId,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: ReviewsCommentInput(
-                      onSave: (comment) {
-                        print('저장된 댓글: $comment');
-                      },
-                    ),
+                  ReviewsCommentInput(
+                    onSave: (comment) {
+                      _reviewsCommentsController.postComment(comment);
+                    },
+                    reviewId: widget.reviewId,
                   ),
                 ],
               ),

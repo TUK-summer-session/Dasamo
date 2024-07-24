@@ -1,11 +1,15 @@
-import 'package:dasamo/src/controllers/reviews_comments_controller.dart';
+import 'package:dasamo/src/controllers/review/reviews_comments_controller.dart';
+import 'package:dasamo/src/controllers/user/user_controller.dart';
+import 'package:dasamo/src/widgets/comment/separate_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ReviewsCommentInput extends StatefulWidget {
   final Function(String) onSave;
+  final int reviewId;
 
-  const ReviewsCommentInput({Key? key, required this.onSave}) : super(key: key);
+  const ReviewsCommentInput(
+      {super.key, required this.reviewId, required this.onSave});
 
   @override
   _ReviewsCommentInputState createState() => _ReviewsCommentInputState();
@@ -14,12 +18,13 @@ class ReviewsCommentInput extends StatefulWidget {
 class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
   TextEditingController _textEditingController = TextEditingController();
   late ReviewsCommentsController _reviewsCommentsController;
+  final UserController _userController = Get.put(UserController());
 
   @override
   void initState() {
     super.initState();
     _reviewsCommentsController =
-        Get.put(ReviewsCommentsController(1)); // 리뷰 ID를 1로 설정
+        Get.put(ReviewsCommentsController(widget.reviewId));
   }
 
   @override
@@ -32,50 +37,50 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage('assets/images/profile.jpg'), // 로컬 이미지
-                  fit: BoxFit.cover, // 이미지를 컨테이너 크기에 맞춤
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100, // 원하는 배경 색상 설정
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage(_userController.profileImageUrl.value),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              child: TextField(
-                controller: _textEditingController,
-                decoration: InputDecoration(
-                  hintText: '댓글을 입력하세요...', // 입력창 안내 메시지
-                  border: OutlineInputBorder(), // 테두리 스타일
+              SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 24,
+                  child: SeparateTextField(
+                    controller: _textEditingController,
+                    hintText: '댓글을 입력해주세요.',
+                  ),
                 ),
-                maxLines: 3, // 최대 줄 수
-                minLines: 1, // 최소 줄 수
-                onChanged: (text) {
-                  // 입력된 텍스트를 상태로 관리하거나 필요한 경우 처리
+              ),
+              IconButton(
+                icon: Icon(Icons.arrow_circle_up_outlined),
+                onPressed: () async {
+                  String comment = _textEditingController.text;
+                  if (comment.isNotEmpty) {
+                    await _reviewsCommentsController.postComment(comment);
+                    _textEditingController.clear();
+                  }
                 },
               ),
-            ),
-            SizedBox(width: 8), // 아이콘과 TextField 사이 간격 조정
-            IconButton(
-              icon: Icon(Icons.arrow_upward), // 아이콘 설정
-              onPressed: () async {
-                String comment = _textEditingController.text;
-                if (comment.isNotEmpty) {
-                  await _reviewsCommentsController
-                      .postComment(comment); // 댓글을 POST합니다.
-                  _textEditingController.clear(); // 입력창 초기화
-                }
-              },
-            ),
-          ],
+            ],
+          ),
         ),
-        SizedBox(height: 20),
       ],
     );
   }
