@@ -35,9 +35,6 @@ class _ReviewsCommentInputState extends State<ReviewsCommentInput> {
 
   @override
   Widget build(BuildContext context) {
-    final memberId = int.parse(userController.userId.value);
-    print('Review ID!!!!: ${widget.reviewId}');
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [

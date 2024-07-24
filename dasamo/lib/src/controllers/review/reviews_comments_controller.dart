@@ -14,15 +14,12 @@ class ReviewsCommentsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print('ReviewsCommentsController initialized with reviewId: $reviewId');
     fetchComments();
   }
 
   // 리뷰 댓글 조회
   Future<void> fetchComments() async {
     final url = Uri.parse('$baseUrl/$reviewId');
-
-    print('Fetching comments for reviewId: $reviewId');
 
     try {
       final response = await http.get(url);
@@ -64,14 +61,8 @@ class ReviewsCommentsController extends GetxController {
       'detail': comment,
     });
 
-    print('Posting comment to: $url');
-    print('Request body: $body');
-
     try {
       final response = await http.post(uri, headers: headers, body: body);
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         fetchComments(); // 댓글 목록을 다시 불러옵니다.
