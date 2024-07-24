@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dasamo/src/controllers/mypage_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -87,6 +88,44 @@ class CommunityController extends GetxController {
       }
     } catch (e) {
       print('Error: $e');
+    }
+  }
+
+// 커뮤니티 삭제 메서드 추가
+  Future<void> deleteCommunity({
+    required int communityId,
+    required int memberId,
+  }) async {
+    final uri = Uri.parse('http://10.0.2.2:3000/api/community/$communityId');
+
+    try {
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'memberId': memberId}),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // 성공적으로 삭제한 경우, 커뮤니티 리스트 갱신
+        communityList.removeWhere(
+            (community) => community['communityId'] == communityId);
+        print('커뮤니티 삭제 성공');
+        final myPageController = Get.find<MyPageController>();
+        await myPageController.fetchData();
+        await fetchCommunities(memberId);
+      } else {
+        final errorData = json.decode(response.body);
+        print(
+            'Failed to delete community: ${response.statusCode}, ${errorData['message']}');
+      }
+    } catch (e) {
+      print('Exception occurred: $e');
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dasamo/src/controllers/community_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dasamo/src/controllers/mypage_controller.dart';
@@ -176,18 +177,23 @@ class _MyPageState extends State<MyPage> {
                     itemBuilder: (context, index) {
                       final imageUrl = currentTabData[index]['imageUrl'] ?? '';
                       final reviewId = currentTabData[index]['reviewId'];
+                      final communityId =
+                          currentTabData[index]['communityId']; // 커뮤니티 ID
 
                       return GestureDetector(
                         onTap: () {
-                          print('Image tapped with reviewId: $reviewId');
-                          if (reviewId != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ReviewShow(reviewId: reviewId),
-                              ),
-                            );
+                          if (adjustedIndex == 1) {
+                            _showOptionsMenu(context, communityId);
+                          } else {
+                            if (reviewId != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ReviewShow(reviewId: reviewId),
+                                ),
+                              );
+                            }
                           }
                         },
                         child: Container(
@@ -243,6 +249,51 @@ class _MyPageState extends State<MyPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showOptionsMenu(BuildContext context, int communityId) {
+    final UserController userController = Get.find();
+    final CommunityController communityController = Get.find();
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(
+                  Icons.delete,
+                  color: Colors.red, // 빨간색
+                ),
+                title: Text('삭제하기'),
+                onTap: () async {
+                  print('Community ID: $communityId'); // 콘솔에 커뮤니티 ID 출력
+
+                  final memberId =
+                      int.parse(userController.userId.value); // 현재 사용자 ID 가져오기
+
+                  try {
+                    await communityController.deleteCommunity(
+                      communityId: communityId,
+                      memberId: memberId,
+                    );
+                    // 커뮤니티 삭제 후 화면 업데이트 또는 피드백 제공
+                  } catch (e) {
+                    print('Error deleting community: $e');
+                  }
+
+                  Navigator.pop(context);
+                },
+              ),
+              // 다른 옵션을 추가할 수 있습니다.
+            ],
+          ),
+        );
+      },
     );
   }
 
