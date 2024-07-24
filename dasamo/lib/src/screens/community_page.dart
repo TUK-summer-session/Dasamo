@@ -197,7 +197,7 @@ class _CommunityPageState extends State<CommunityPage> {
                               ),
                             ),
                             SizedBox(width: 5),
-                            CommunityCommentIcon(),
+                            CommunityCommentIcon(communityId: communityId),
                           ],
                         ),
                       ],
