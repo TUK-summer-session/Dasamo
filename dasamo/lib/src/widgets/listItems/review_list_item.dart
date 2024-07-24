@@ -1,3 +1,4 @@
+import 'package:dasamo/src/screens/review/show.dart';
 import 'package:flutter/material.dart';
 import 'package:dasamo/src/widgets/buttons/tags/review_tag_button.dart';
 import 'package:get/get.dart';
@@ -15,7 +16,13 @@ class ReviewListItem extends StatelessWidget {
     return InkWell(
       onTap: () {
         print("item id: ${item['id']}");
-        Get.toNamed('/review/${item['id']}');
+        // Get.toNamed('/review/${item['id']}');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReviewShow(reviewId: item['id']),
+          ),
+        );
       },
       child: Stack(
         children: [
