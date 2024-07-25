@@ -60,16 +60,25 @@ class ReviewsComments extends StatelessWidget {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: Text('삭제 확인'),
-                                  content: Text('이 댓글을 삭제하시겠습니까?'),
+                                  content: Text(
+                                    '이 댓글을 삭제하시겠습니까?',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
                                   actions: [
                                     TextButton(
-                                      child: Text('취소'),
+                                      child: Text(
+                                        '취소',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
                                       onPressed: () {
                                         Navigator.of(context).pop(false);
                                       },
                                     ),
                                     TextButton(
-                                      child: Text('삭제'),
+                                      child: Text(
+                                        '삭제',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
                                       onPressed: () {
                                         Navigator.of(context).pop(true);
                                       },

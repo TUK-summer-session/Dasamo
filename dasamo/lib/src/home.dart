@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.feed),
-      label: '동네',
+      label: '커뮤',
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.person_outline),
