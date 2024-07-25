@@ -18,10 +18,11 @@ class _CommunityCommentIconState extends State<CommunityCommentIcon> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    final CommunityCommentsController _communityCommentsController =
-        Get.put(CommunityCommentsController(widget.communityId));
+    Get.lazyPut(() => CommunityCommentsController(widget.communityId),
+        tag: widget.communityId.toString());
+    CommunityCommentsController _communityCommentsController =
+        Get.find(tag: widget.communityId.toString());
     _communityCommentsController.fetchComments();
   }
 
