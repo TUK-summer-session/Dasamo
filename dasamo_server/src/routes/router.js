@@ -11,21 +11,19 @@ const apiCommunityController = require('../api/community/controller');
 const { logRequestTime } = require('../middleware/log');
 const { s3upload } = require('../config/multer');
 
-// router.get('/', webController.home);
-// router.get('/page/:route', logRequestTime, webController.page);
 router.use(logRequestTime);
 
-// File upload
-router.post('/file', upload.single('file'), (req, res) => {
-    console.log(req.file);
-    res.json(req.file);
-});
+// // File upload
+// router.post('/file', upload.single('file'), (req, res) => {
+//     console.log(req.file);
+//     res.json(req.file);
+// });
 
-// 테스트
-router.post('/img', s3upload.single('img'), (req, res) => {
-    console.log(req.file);
-    res.json({ url: req.file.location });
-  });
+// // 테스트
+// router.post('/img', s3upload.single('img'), (req, res) => {
+//     console.log(req.file);
+//     res.json({ url: req.file.location });
+//   });
 
 // Member APIs
 router.post('/api/members/login', apiMemberController.login);
